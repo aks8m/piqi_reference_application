@@ -56,7 +56,8 @@ namespace PIQI_Engine.Server.Models
         /// </summary>
         /// <param name="jToken">The JSON token containing the value information.</param>
         /// <param name="dataTypeList">The list of <see cref="DataType"/> objects used to resolve the value's type.</param>
-        public Value(JToken jToken, List<DataType> dataTypeList)
+        /// <param name="referenceData">The optional <see cref="PIQIReferenceData"/> object used to resolve the codeable concept recognized systems.</param>
+        public Value(JToken jToken, List<DataType> dataTypeList, PIQIReferenceData? referenceData)
         {
             // Initialize coding list
             CodingList = new List<Coding>();
@@ -85,7 +86,7 @@ namespace PIQI_Engine.Server.Models
 
             // Process type node
             JToken typeToken = jToken.SelectToken("type");
-            if (typeToken != null) TypeCC = new CodeableConcept(typeToken);
+            if (typeToken != null) TypeCC = new CodeableConcept(typeToken, referenceData);
 
             // Resolve DataType from TypeCC
             if (TypeCC != null) Type = dataTypeList.FirstOrDefault(dt => dt.Code == TypeCC.Text);

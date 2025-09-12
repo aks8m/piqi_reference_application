@@ -17,6 +17,12 @@ namespace PIQI_Engine.Server.Models
         public List<DataType> DataTypeList { get; set; } = new List<DataType>();
 
         /// <summary>
+        /// Reference code system to set valid code system in codeable concepts.
+        /// </summary>
+        public PIQIReferenceData? RefData { get; set; }
+
+
+        /// <summary>
         /// The <see cref="EntityModel"/> that this message model will be built against.
         /// </summary>
         public EntityModel? EntityModel { get; set; }
@@ -122,13 +128,24 @@ namespace PIQI_Engine.Server.Models
         }
 
         /// <summary>
-        /// Loads the content portion of the message, populating root, classes, elements, and attributes.
-        /// Requires header to be loaded and <see cref="DataTypeList"/>,  <see cref="RootEntityFieldName"/> or <see cref="RootEntityName"/>, and <see cref="EntityList"/> to be set.
+        /// Loads the content portion of the message, populating the root, classes, elements, and attributes.
         /// </summary>
-        public void LoadContent()
+        /// <remarks>
+        /// This method requires the message header to already be loaded.
+        /// The following properties must also be set before calling:
+        /// <list type="bullet">
+        ///   <item><description><see cref="DataTypeList"/></description></item>
+        ///   <item><description><see cref="RootEntityFieldName"/></description></item>
+        ///   <item><description><see cref="RootEntityName"/></description></item>
+        ///   <item><description><see cref="EntityModel"/></description></item>
+        /// </list>
+        /// </remarks>
+        /// /// <param name="referenceData">The reference data with list of valid code systems.</param>
+        public void LoadContent(PIQIReferenceData referenceData)
         {
             try
             {
+                if (referenceData != null) RefData = referenceData;
                 string? rootName = RootEntityFieldName ?? RootEntityName;
                 if (DataTypeList == null) throw new Exception("DataTypeList not initialized");
                 if (EntityModel == null) throw new Exception("Entity model not loaded");
@@ -265,12 +282,12 @@ namespace PIQI_Engine.Server.Models
                                 // This is a complex attribute
                                 JObject jObject = jProperty.Children<JObject>().First();
                                 attributeItem.MessageText = jObject.ToString();
-                                attributeItem.MessageData = new CodeableConcept(jObject);
+                                attributeItem.MessageData = new CodeableConcept(jObject, RefData);
                             }
                             else
                             {
                                 attributeItem.MessageText = jProperty.Value.ToString();
-                                attributeItem.MessageData = new CodeableConcept(jProperty);
+                                attributeItem.MessageData = new CodeableConcept(jProperty, RefData);
                             }
                         }
                         else if (attributeEntity.DataTypeID == EntityDataTypeEnum.OBSVAL)
@@ -280,12 +297,12 @@ namespace PIQI_Engine.Server.Models
                                 // This is a complex attribute
                                 JObject jObject = jProperty.Children<JObject>().First();
                                 attributeItem.MessageText = jObject.ToString();
-                                attributeItem.MessageData = new Value(jObject, DataTypeList);
+                                attributeItem.MessageData = new Value(jObject, DataTypeList, RefData);
                             }
                             else
                             {
                                 attributeItem.MessageText = jProperty.Value.ToString();
-                                attributeItem.MessageData = new Value(jProperty, DataTypeList);
+                                attributeItem.MessageData = new Value(jProperty, DataTypeList, RefData);
                             }
                         }
                         else if (attributeEntity.DataTypeID == EntityDataTypeEnum.RV)

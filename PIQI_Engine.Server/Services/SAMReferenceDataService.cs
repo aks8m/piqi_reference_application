@@ -53,39 +53,6 @@ namespace PIQI_Engine.Server.Services
         #region Methods
 
         /// <summary>
-        /// Updates a list of <see cref="Coding"/> objects with recognized code system information
-        /// based on the current <see cref="ReferenceData"/>.
-        /// </summary>
-        /// <param name="codingList">
-        /// The list of <see cref="Coding"/> objects to be updated. Each coding's 
-        /// <see cref="Coding.HasRecognizedCodeSystem"/> and <see cref="Coding.RecognizedCodeSystem"/> 
-        /// properties will be set if a recognized code system is found.
-        /// </param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown if <see cref="ReferenceData"/> is <c>null</c> or invalid.
-        /// </exception>
-        public void SetRecognizedCodeSystems(List<Coding> codingList)
-        {
-            try
-            {
-                if (ReferenceData == null)
-                    throw new InvalidOperationException("Missing or invalid reference data for recognized code systems check.");
-
-                // Update each coding with recognized code system information
-                foreach (Coding coding in codingList)
-                {
-                    var recognizedCodeSystem = coding.CodeSystemList?.FirstOrDefault(cs => ReferenceData.GetCodeSystem(cs) != null);
-                    coding.HasRecognizedCodeSystem = recognizedCodeSystem != null;
-                    coding.RecognizedCodeSystem = recognizedCodeSystem;
-                }
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Updates the <see cref="Coding.IsInteroperable"/> property for each <see cref="Coding"/>
         /// in the given list based on the specified interoperability code systems.
         /// </summary>
@@ -145,9 +112,6 @@ namespace PIQI_Engine.Server.Services
             {
                 if (ReferenceData == null)
                     throw new InvalidOperationException("Missing or invalid reference data for FHIR server check.");
-
-                // Update each coding with recognized code system information
-                SetRecognizedCodeSystems(codeableConcept.CodingList);
 
                 // Check each coding code against their code system lists
                 foreach (Coding coding in codeableConcept.CodingList)

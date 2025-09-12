@@ -115,7 +115,7 @@ namespace PIQI_Engine.Server.Engines
                 message.EvaluationRubric = evaluationRubric;
 
                 // Load the message content  
-                MessageModelBuilder.LoadContent(message.MessageModel);
+                MessageModelBuilder.LoadContent(message.MessageModel, message.RefData);
 
                 // Process the message
                 await ProcessMessageAsync(message);

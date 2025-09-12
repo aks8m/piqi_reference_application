@@ -100,7 +100,8 @@ namespace PIQI_Engine.Server.Models
         /// Initializes a new instance from a <see cref="JToken"/> representing a codeable concept.
         /// </summary>
         /// <param name="jToken">The JSON token to parse.</param>
-        public CodeableConcept(JToken jToken)
+        /// <param name="referenceData">The reference data with recognized code systems.</param>
+        public CodeableConcept(JToken jToken, PIQIReferenceData? referenceData)
         {
             // Initialize lists
             CodingList = new List<Coding>();
@@ -138,13 +139,16 @@ namespace PIQI_Engine.Server.Models
                         coding.CodeText = Text;
                 }
             }
+            if (referenceData != null) SetRecognizedCodeSystems(referenceData);
+
         }
 
         /// <summary>
         /// Initializes a new instance from a <see cref="JProperty"/> representing a codeable concept.
         /// </summary>
         /// <param name="jProperty">The JSON property to parse.</param>
-        public CodeableConcept(JProperty jProperty)
+        /// /// <param name="referenceData">The reference data with recognized code systems.</param>
+        public CodeableConcept(JProperty jProperty, PIQIReferenceData? referenceData)
         {
             // Initialize lists
             CodingList = new List<Coding>();
@@ -180,6 +184,7 @@ namespace PIQI_Engine.Server.Models
                         coding.CodeText = Text;
                 }
             }
+            if (referenceData != null) SetRecognizedCodeSystems(referenceData);
         }
 
         #endregion
@@ -209,6 +214,7 @@ namespace PIQI_Engine.Server.Models
                 var recognizedCodeSystem = coding.CodeSystemList?.FirstOrDefault(cs => referenceData.GetCodeSystem(cs) != null);
                 coding.HasRecognizedCodeSystem = recognizedCodeSystem != null;
                 coding.RecognizedCodeSystem = recognizedCodeSystem;
+                if (recognizedCodeSystem != null) coding.CodeSystem = recognizedCodeSystem;
             }
         }
         #endregion

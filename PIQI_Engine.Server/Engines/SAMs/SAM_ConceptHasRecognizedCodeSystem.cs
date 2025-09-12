@@ -65,11 +65,6 @@ namespace PIQI_Engine.Server.Engines.SAMs
                 // Cast data to CodeableConcept
                 CodeableConcept codeableConcept = (CodeableConcept)data;
 
-                // Update each coding with recognized code system information
-                // Checks if FHIR server has been called because SetRecognizedCodeSystems is called in CallFHIRServer()
-                if (!codeableConcept.FHIRServerCalled)
-                    _SAMReferenceDataService.SetRecognizedCodeSystems(codeableConcept.CodingList);
-
                 // Evaluate success if any coding is recognized
                 passed = codeableConcept.CodingList.Any(t => t.HasRecognizedCodeSystem);
 

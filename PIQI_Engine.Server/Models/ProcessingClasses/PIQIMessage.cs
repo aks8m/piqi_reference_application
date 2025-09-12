@@ -254,10 +254,10 @@ namespace PIQI_Engine.Server.Models
 
                 audit.Add("messageNumerator", statResponse.MessageResults.Numerator.ToString());
                 audit.Add("messageDenominator", statResponse.MessageResults.Denominator.ToString());
-                audit.Add("messageScore", ((float)statResponse.MessageResults.Numerator / statResponse.MessageResults.Denominator * 100).ToString("F"));
+                audit.Add("messageScore", (statResponse.MessageResults.Denominator > 0 ? ((int)((double)statResponse.MessageResults.Numerator / (double)statResponse.MessageResults.Denominator * 100)) : 0).ToString());
                 audit.Add("messageNumeratorWeighted", statResponse.MessageResults.WeightedNumerator.ToString());
                 audit.Add("messageDenominatorWeighted", statResponse.MessageResults.WeightedDenominator.ToString());
-                audit.Add("messageScoreWeighted", ((float)statResponse.MessageResults.WeightedNumerator / statResponse.MessageResults.WeightedDenominator * 100).ToString("F"));
+                audit.Add("messageScoreWeighted", (statResponse.MessageResults.WeightedDenominator > 0 ? (int)((double)statResponse.MessageResults.WeightedNumerator / (double)statResponse.MessageResults.WeightedDenominator * 100) : 0).ToString());
                 audit.Add("messageCriticalFailureCount", statResponse.MessageResults.CriticalFailureCount.ToString());
             }
             catch

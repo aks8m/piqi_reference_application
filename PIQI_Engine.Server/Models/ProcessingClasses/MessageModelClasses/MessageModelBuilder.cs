@@ -39,12 +39,13 @@
         /// Populates the content portion of the specified <see cref="MessageModel"/> by loading its classes, elements, and attributes.
         /// </summary>
         /// <param name="messageModel">The message model to populate.</param>
-        public static void LoadContent(MessageModel messageModel)
+        /// <param name="referenceData">The reference data used to set recognized code systems in codeable concepts.</param>
+        public static void LoadContent(MessageModel messageModel, PIQIReferenceData referenceData)
         {
             try
             {
                 // Process the content
-                messageModel.LoadContent();
+                messageModel.LoadContent(referenceData);
             }
             catch
             {
