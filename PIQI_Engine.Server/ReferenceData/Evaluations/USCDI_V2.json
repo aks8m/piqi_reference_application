@@ -19,7 +19,7 @@
       "description": "USCDI 2",
       "entity": "DEM.SEX",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Birth sex is conformant",
+      "samNameOverride": "Birth sex is conformant",
       "failureNameOverride": "Birth sex not conformant",
       "SAMParameters": [
         {
@@ -37,7 +37,7 @@
       "description": "USCDI 2",
       "entity": "LAB.ORD",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Lab Order is LOINC",
+      "samNameOverride": "Lab Order is LOINC",
       "failureNameOverride": "Lab Order not LOINC",
       "SAMParameters": [
         {
@@ -55,7 +55,7 @@
       "description": "USCDI 2",
       "entity": "CND.ONDT",
       "SAMMnemonic": "Attr_IsPastDate",
-      "successNameOverride": "Condition onset date is valid",
+      "samNameOverride": "Condition onset date is valid",
       "failureNameOverride": "Condition onset date is invalid",
       "scoringEffect": "Scoring",
       "scoringWeight": 1,
@@ -66,7 +66,7 @@
       "description": "USCDI 2",
       "entity": "MED.DRUG",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Medication is valid concept",
+      "samNameOverride": "Medication is valid concept",
       "failureNameOverride": "Medication is invalid ",
       "SAMParameters": [
         {
@@ -84,7 +84,7 @@
       "description": "USCDI 2",
       "entity": "CND.COND",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Condition is SNOMED-CT or ICD10CM",
+      "samNameOverride": "Condition is SNOMED-CT or ICD10CM",
       "failureNameOverride": "Condition is not SNOMED-CT or ICD10CM",
       "SAMParameters": [
         {
@@ -102,7 +102,7 @@
       "description": "USCDI 2",
       "entity": "VIT.RESUNIT",
       "SAMMnemonic": "Attr_InExternalList",
-      "successNameOverride": "Vital sign result unit is UCUM",
+      "samNameOverride": "Vital sign result unit is UCUM",
       "failureNameOverride": "Vital sign result unit is not UCUM",
       "SAMParameters": [
         {
@@ -121,7 +121,7 @@
       "description": "USCDI 2",
       "entity": "ALG.REACT",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Allergy Reaction is SNOMED-CT",
+      "samNameOverride": "Allergy Reaction is SNOMED-CT",
       "failureNameOverride": "Allergy Reaction is not SNOMED-CT",
       "SAMParameters": [
         {
@@ -139,7 +139,7 @@
       "description": "USCDI 2",
       "entity": "VIT.VITAL",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Vital sign is valid concept",
+      "samNameOverride": "Vital sign is valid concept",
       "failureNameOverride": "Vital sign is invalid",
       "SAMParameters": [
         {
@@ -157,7 +157,7 @@
       "description": "USCDI 2",
       "entity": "DEM.DOB",
       "SAMMnemonic": "Attr_IsPastDate",
-      "successNameOverride": "Date of birth is valid past date",
+      "samNameOverride": "Date of birth is valid past date",
       "failureNameOverride": "Date of birth is invalid",
       "scoringEffect": "Scoring",
       "scoringWeight": 1,
@@ -168,7 +168,7 @@
       "description": "USCDI 2",
       "entity": "DEM.RACE",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Race is valid concept",
+      "samNameOverride": "Race is valid concept",
       "failureNameOverride": "Race is invalid",
       "SAMParameters": [
         {
@@ -186,7 +186,7 @@
       "description": "USCDI 2",
       "entity": "LAB.RESVALUE",
       "SAMMnemonic": "Attr_IsPopulated",
-      "successNameOverride": "Lab result value is populated",
+      "samNameOverride": "Lab result value is populated",
       "failureNameOverride": "Lab result value is not populated",
       "scoringEffect": "Scoring",
       "scoringWeight": 1,
@@ -197,7 +197,7 @@
       "description": "USCDI 2",
       "entity": "PRC.PROC",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Procedure is valid concept",
+      "samNameOverride": "Procedure is valid concept",
       "failureNameOverride": "Procedure is invalid",
       "SAMParameters": [
         {
@@ -215,7 +215,7 @@
       "description": "USCDI 2",
       "entity": "LAB.TEST",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Lab Test is LOINC",
+      "samNameOverride": "Lab Test is LOINC",
       "failureNameOverride": "Lab Test not LOINC",
       "SAMParameters": [
         {
@@ -233,7 +233,7 @@
       "description": "USCDI 2",
       "entity": "DEM.LANG",
       "SAMMnemonic": "Attr_IsPopulated",
-      "successNameOverride": "Primary language is populated",
+      "samNameOverride": "Primary language is populated",
       "failureNameOverride": "Primary language is not populated",
       "scoringEffect": "Scoring",
       "scoringWeight": 1,
@@ -244,7 +244,7 @@
       "description": "USCDI 2",
       "entity": "DEM.ETHN",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Ethnicity is valid code",
+      "samNameOverride": "Ethnicity is valid code",
       "failureNameOverride": "Ethnicity is invalid",
       "SAMParameters": [
         {
@@ -262,7 +262,7 @@
       "description": "USCDI 2",
       "entity": "IMM.ADMDT",
       "SAMMnemonic": "Attr_IsPastDate",
-      "successNameOverride": "Immunization date is valid",
+      "samNameOverride": "Immunization date is valid",
       "failureNameOverride": "Immunization date is invalid",
       "scoringEffect": "Scoring",
       "scoringWeight": 1,
@@ -273,7 +273,7 @@
       "description": "USCDI 2",
       "entity": "ALG.SUB",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Allergy Substance is RxNorm or SNOMED-CT",
+      "samNameOverride": "Allergy Substance is RxNorm or SNOMED-CT",
       "failureNameOverride": "Allergy Substance is not RxNorm or SNOMED-CT",
       "SAMParameters": [
         {
@@ -291,7 +291,7 @@
       "description": "USCDI 2",
       "entity": "CND.RESDT",
       "SAMMnemonic": "Attr_IsPastDate",
-      "successNameOverride": "Condition resolution date is valid",
+      "samNameOverride": "Condition resolution date is valid",
       "failureNameOverride": "Condition resolution date is invalid",
       "conditionalSAM": "Attr_IsPopulated",
       "scoringEffect": "Scoring",
@@ -303,7 +303,7 @@
       "description": "USCDI 2",
       "entity": "IMM.VACC",
       "SAMMnemonic": "Concept_IsValidMember",
-      "successNameOverride": "Immunization is valid concept",
+      "samNameOverride": "Immunization is valid concept",
       "failureNameOverride": "Immunization is not valid concept",
       "SAMParameters": [
         {
