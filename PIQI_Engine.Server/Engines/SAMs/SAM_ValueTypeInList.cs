@@ -12,10 +12,10 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// Initializes a new instance of the <see cref="SAM_ValueTypeInList"/> class.
         /// </summary>
         /// <param name="sam">The parent SAM object.</param>
-        /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to access reference data and make FHIR API calls.
+        /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public SAM_ValueTypeInList(SAM sam, SAMReferenceDataService referenceDataService) : base(sam, referenceDataService) { }
+        public SAM_ValueTypeInList(SAM sam, SAMService samService) : base(sam, samService) { }
 
         /// <summary>
         /// Evaluates whether the <see cref="Value"/> contained in the provided request 
@@ -51,8 +51,8 @@ namespace PIQI_Engine.Server.Engines.SAMs
 
                 // Get allowed types parameter
                 if (request.ParmList == null) throw new Exception("Parameter list was not supplied");
-                Tuple<string, string> arg1 = request.ParmList.Where(t => t.Item1 == "Value Type List").FirstOrDefault();
-                if (arg1 == null) throw new Exception("[Value Type List] parameter not found");
+                Tuple<string, string> arg1 = request.ParmList.Where(t => t.Item1 == "VALUE_TYPE_CSV").FirstOrDefault();
+                if (arg1 == null) throw new Exception("[Value Type CSV] parameter not found");
                 string setMnemonic = arg1.Item2;
                 string valueText = data.Text;
 

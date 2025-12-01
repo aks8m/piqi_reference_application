@@ -9,7 +9,7 @@
         /// <summary>
         /// The list of code systems contained in the library.
         /// </summary>
-        public List<CodeSystem> CodeSystemLibrary { get; set; }
+        public List<CodeSystem> CodeSystemLibrary { get; set; } = new List<CodeSystem>();
     }
 
     /// <summary>
@@ -35,6 +35,6 @@
         /// <summary>
         /// A list of identifiers associated with this code system.
         /// </summary>
-        public List<string> CodeSystemIdentifiers { get; set; }
+        public List<string> CodeSystemIdentifiers { get; set; } = new List<string>();
     }
 }

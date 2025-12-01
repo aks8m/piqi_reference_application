@@ -12,11 +12,6 @@ namespace PIQI_Engine.Server.Models
         #region Properties
 
         /// <summary>
-        /// The evaluation rubric used for scoring this message.
-        /// </summary>
-        public EvaluationRubric EvaluationRubric { get; set; }
-
-        /// <summary>
         /// The request that initiated this PIQI message.
         /// </summary>
         public PIQIRequest PIQIRequest { get; set; }
@@ -32,14 +27,14 @@ namespace PIQI_Engine.Server.Models
         public MessageModel MessageModel { get; set; }
 
         /// <summary>
-        /// Dictionary of all PIQI SAMs (Scoring and Auditing Methods) associated with this message.
+        /// Gets or sets the evaluation manager responsible for executing and tracking evaluation processes.
         /// </summary>
-        public Dictionary<string, PIQISAM> SAMDict { get; set; }
+        public EvaluationManager EvaluationManager { get; set; }
 
         /// <summary>
         /// Statistical results generated from processing this message.
         /// </summary>
-        public StatMethodResult StatMethodResult { get; set; }
+        public StatResponse StatResponse { get; set; }
 
         /// <summary>
         /// Formatted statistical result for this message.
@@ -57,7 +52,7 @@ namespace PIQI_Engine.Server.Models
         public PIQIMessage(PIQIRequest piqiRequest)
         {
             PIQIRequest = piqiRequest;
-            SAMDict = new Dictionary<string, PIQISAM>();
+            EvaluationManager = new EvaluationManager();
         }
 
         #endregion
@@ -67,45 +62,32 @@ namespace PIQI_Engine.Server.Models
         /// <summary>
         /// Generates the statistical result for this PIQI message by processing all applicable PIQI SAMs.
         /// </summary>
-        /// <returns>A <see cref="StatMethodResult"/> containing aggregated scoring, pass/fail, and informational results.</returns>
-        public StatMethodResult GenerateStatResponse()
+        /// <returns>A <see cref="StatResponse"/> containing aggregated scoring, pass/fail, and informational results.</returns>
+        public StatResponse GenerateStatResponse()
         {
             // Create a new stat result object
-            StatMethodResult result = new StatMethodResult();
+            StatResponse = new StatResponse();
 
             try
             {
-                // Get the list of PIQI SAMs that are scorable (neither conditional nor dependent)
-                List<PIQISAM> piqiSAMList = SAMDict.Values
-                    .Where(s => !s.IsCondition && !s.IsDependency)
-                    .ToList();
-
-                // Process results for each scorable PIQI SAM
-                foreach (var piqiSAM in piqiSAMList)
+                // Process results for each scorable evaluation result
+                foreach (var evaluationResult in EvaluationManager.EvaluationResultDict.Values)
                 {
-                    result.ProcessResult(piqiSAM, RefData);
+                    // Ignore conditional or dependent results
+                    if (evaluationResult.IsConditional || evaluationResult.IsDependent) continue;
+
+                    StatResponse.ProcessResult(evaluationResult, RefData);
                 }
 
-                if (MessageModel?.EntityModel?.Root.Children != null)
+                // Calc classes
+                foreach (EvaluationItem classItem in EvaluationManager.EvaluationItemDict.Values.Where(t => t.ItemType == EntityItemTypeEnum.Class))
                 {
-                    foreach (Entity entity in MessageModel.EntityModel.Root.Children)
+                    StatResponseClass statClass = new StatResponseClass(classItem.Entity.Mnemonic, classItem?.MessageItem?.ChildDict?.Count() ?? 0);
+                    List<StatResponseElement>? elementResponseList = StatResponse.ElementDict?.Values?.Where(t => t.ClassMnemonic == statClass.ClassMnemonic).ToList();
+                    if (elementResponseList != null)
                     {
-                        // Create a new StatMethodResultClass object for this entity type
-                        StatMethodResultClass statMethodResultClass = new StatMethodResultClass(entity.Mnemonic);
-
-                        // Get all StatMethodResultElements that belong to this entity type
-                        List<StatMethodResultElement> elementResponseList = result.ElementDict.Values
-                            .Where(t => t.EntityTypeMnemonic == statMethodResultClass.EntityTypeMnemonic)
-                            .ToList();
-
-                        // Calculate aggregated stats for the class
-                        statMethodResultClass.Calc(elementResponseList);
-
-                        // Add the class stats to the result if it has any elements
-                        if (statMethodResultClass.ElementCount > 0)
-                        {
-                            result.ClassDict.Add(statMethodResultClass.Key, statMethodResultClass);
-                        }
+                        statClass.Calc(elementResponseList);
+                        StatResponse.ClassDict.Add(statClass.Key, statClass);
                     }
                 }
             }
@@ -114,9 +96,8 @@ namespace PIQI_Engine.Server.Models
                 throw;
             }
 
-            // Save and return the generated statistical result
-            StatMethodResult = result;
-            return result;
+            // Return the generated statistical result
+            return StatResponse;
         }
 
         #endregion
@@ -144,7 +125,7 @@ namespace PIQI_Engine.Server.Models
                 Audit_AddMessageInfo(msg, FormattedStatResponse);
 
                 // Process the message model recursively
-                Audit_ProcessMessageModelItem(MessageModel.RootItem, null, msg, MessageModel.EntityModel.Root);
+                Audit_ProcessMessageModelItem(EvaluationManager.RootItem, msg);
 
                 return msg.ToString();
             }
@@ -162,77 +143,63 @@ namespace PIQI_Engine.Server.Models
         /// <param name="parentNode">The parent JSON node to attach audit information.</param>
         /// <param name="entity">The optional entity to process. Used in tandem with item to include processed entities without item data</param>
 
-        private void Audit_ProcessMessageModelItem(MessageModelItem? item, MessageModelItem? parentItem, JToken parentNode, Entity? entity)
+        private void Audit_ProcessMessageModelItem(EvaluationItem evaluationItem, JToken parentNode)
         {
             try
             {
                 JObject? elementNode = null;
-                string itemName = item?.Entity?.FieldName ?? item?.Entity?.Name ?? entity?.FieldName ?? entity?.Name ?? "UNKNOWN";
+                string itemName = evaluationItem?.Entity?.FieldName ?? evaluationItem?.Entity?.Name ?? "UNKNOWN";
 
-                if (item?.ItemType == EntityItemTypeEnum.Root)
+                if (evaluationItem.ItemType == EntityItemTypeEnum.Root)
                 {
-                    itemName = item.Name;
                     JObject itemNode = Utility.JSON_AddObject((JObject)parentNode, itemName);
-                    if (entity?.Children != null)
-                    {
-                        foreach (Entity classEntity in entity.Children.OrderBy(e => e.Name))
-                        {
-                            var classModelItem = item.ChildDict?.Values.FirstOrDefault(c => c.Mnemonic == classEntity.Mnemonic);
-                            Audit_ProcessMessageModelItem(classModelItem, null, itemNode, classEntity);
-                        }
-                    }
+
+                    foreach (EvaluationItem classEvaluationItem in evaluationItem.ChildDict?.Values?.OrderBy(e => e.Entity?.Name).ToList() ?? [])
+                        Audit_ProcessMessageModelItem(classEvaluationItem, itemNode);
                 }
-                else if (entity != null && entity?.DataTypeID == EntityDataTypeEnum.CLS)
+                else if (evaluationItem.ItemType == EntityItemTypeEnum.Class)
                 {
                     JArray itemNode = Utility.JSON_AddArray((JObject)parentNode, itemName);
-                    if (item?.ChildDict != null)
-                    {
-                        foreach (MessageModelItem child in item.ChildDict.Values.OrderBy(c => c.Name))
-                            Audit_ProcessMessageModelItem(child, null, itemNode, entity?.Children?.FirstOrDefault());
-                    }
+
+                    foreach (EvaluationItem elementEvaluationItem in evaluationItem.ChildDict?.Values?.OrderBy(e => e.Entity?.Name).ToList() ?? [])
+                        Audit_ProcessMessageModelItem(elementEvaluationItem, itemNode);
                 }
-                else if (item?.ItemType == EntityItemTypeEnum.Element)
+                else if (evaluationItem.ItemType == EntityItemTypeEnum.Element)
                 {
                     JObject itemNode = Utility.JSON_AddObject((JArray)parentNode, itemName);
                     elementNode = itemNode;
 
-                    if (entity?.Children != null)
-                    {
-                        foreach (Entity attrEntity in entity.Children.OrderBy(e => e.Name))
-                        {
-                            var attrModelItem = item.ChildDict?.Values.FirstOrDefault(c => c.Mnemonic == attrEntity.Mnemonic);
-                            Audit_ProcessMessageModelItem(attrModelItem, item, itemNode, attrEntity);
-                        }
-                    }
+                    foreach (EvaluationItem attributeEvaluationItem in evaluationItem.ChildDict?.Values?.OrderBy(e => e.Entity?.Name).ToList() ?? [])
+                        Audit_ProcessMessageModelItem(attributeEvaluationItem, itemNode);
                 }
-                else if (entity != null && entity?.DataTypeID > EntityDataTypeEnum.ELM)
+                else if (evaluationItem.ItemType == EntityItemTypeEnum.Attribute)
                 {
                     JObject? attrAuditItem = new JObject();
-                    if (item != null)
+                    if (evaluationItem.MessageItem != null)
                     {
                         JToken? attrDataItem = null;
 
                         // Handle leaf elements according to their data type
-                        if (item?.Entity?.DataTypeID == EntityDataTypeEnum.CC)
-                            attrDataItem = Utility.JSON_AddCodeableConceptObject((CodeableConcept)item.MessageData);
-                        else if (item?.Entity?.DataTypeID == EntityDataTypeEnum.OBSVAL)
-                            attrDataItem = Utility.JSON_AddValueObject((Value)item.MessageData);
-                        else if (item?.Entity?.DataTypeID == EntityDataTypeEnum.RV)
-                            attrDataItem = Utility.JSON_AddRefRangeObject((ReferenceRange)item.MessageData);
+                        if (evaluationItem.Entity?.EntityType.EntityTypeValue == EntityDataTypeEnum.CC)
+                            attrDataItem = Utility.JSON_AddCodeableConceptObject((CodeableConcept)evaluationItem.MessageItem?.MessageData);
+                        else if (evaluationItem.Entity?.EntityType.EntityTypeValue == EntityDataTypeEnum.OBSVAL)
+                            attrDataItem = Utility.JSON_AddValueObject((Value)evaluationItem.MessageItem?.MessageData);
+                        else if (evaluationItem.Entity?.EntityType.EntityTypeValue == EntityDataTypeEnum.RV)
+                            attrDataItem = Utility.JSON_AddRefRangeObject((ReferenceRange)evaluationItem.MessageItem?.MessageData);
                         else
-                            attrDataItem = (item?.MessageData?.Text ?? "");
+                            attrDataItem = (evaluationItem.MessageItem?.MessageData?.Text ?? "");
 
                         if (attrDataItem == null) throw new Exception("Attribute information not found.");
                         attrAuditItem.Add("data", attrDataItem);
                     }
 
-                    Audit_AddAttributeInfo(attrAuditItem, item ?? parentItem, item == null? entity : null);
+                    Audit_AddAttributeInfo(evaluationItem, attrAuditItem);
 
                     ((JObject)parentNode).Add(itemName, attrAuditItem);
                 }
 
                 if (elementNode != null)
-                    Audit_AddElementInfo(elementNode, item);
+                    Audit_AddElementInfo(evaluationItem, elementNode);
                 else if (elementNode != null) throw new Exception("Element information not found.");
             }
             catch
@@ -272,17 +239,16 @@ namespace PIQI_Engine.Server.Models
         /// <param name="parent">The JSON node to attach the element audit info.</param>
         /// <param name="elementItem">The message model element item to audit.</param>
         /// <returns>The audit JSON node for the element.</returns>
-        private JObject? Audit_AddElementInfo(JObject parent, MessageModelItem elementItem)
+        private JObject? Audit_AddElementInfo(EvaluationItem elementEvaluationItem, JObject parent)
         {
             JObject? auditNode = null;
 
             try
             {
-                List<PIQISAM> elementPIQISAMList = SAMDict.Values
-                    .Where(ps => ps.EntityTypeMnemonic == elementItem.ClassEntity.Mnemonic && ps.EntitySequence == elementItem.ElementSequence)
-                    .ToList();
+                List<EvaluationResult> elementEvaluationResultList = EvaluationManager.EvaluationResultDict.Values
+               .Where(er => er.EvaluationItem.ElementEntityMnemonic == elementEvaluationItem.Entity.Mnemonic && er.EvaluationItem.ElementSequence == elementEvaluationItem.ElementSequence).ToList();
 
-                if (elementPIQISAMList.Count > 0)
+                if (elementEvaluationResultList.Count > 0)
                 {
                     auditNode = Utility.JSON_AddObject(parent, "elementAudit");
 
@@ -292,11 +258,11 @@ namespace PIQI_Engine.Server.Models
                     int numeratorWeight = 0;
                     int criticalFailureCount = 0;
 
-                    foreach (PIQISAM result in elementPIQISAMList
-                                 .Where(ps => !ps.IsDependency && !ps.IsCondition)
-                                 .OrderBy(ps => ps.EntityMnemonic).ThenBy(ps => ps.SAMName))
+                    foreach (EvaluationResult result in elementEvaluationResultList
+                                 .Where(er => !er.IsDependent && !er.IsConditional)
+                                 .OrderBy(er => er.EntityMnemonic).ThenBy(er => er.SamDisplayName))
                     {
-                        if (result.ProcessingState == SAMProcessStateEnum.Passed)
+                        if (result.EvalPassed)
                         {
                             if (result.IsScoring)
                             {
@@ -306,7 +272,7 @@ namespace PIQI_Engine.Server.Models
                                 numeratorWeight += result.ScoringWeight;
                             }
                         }
-                        else if (result.ProcessingState == SAMProcessStateEnum.Failed)
+                        else if (result.EvalFailed)
                         {
                             if (result.IsScoring)
                             {
@@ -340,27 +306,16 @@ namespace PIQI_Engine.Server.Models
         /// <param name="parent">The JSON node to attach the element audit info.</param>
         /// <param name="attributeItem">The message model element item to audit.</param>
         /// <returns>The audit JSON node for the element.</returns>
-        private JObject? Audit_AddAttributeInfo(JObject parent, MessageModelItem attributeItem, Entity? entity)
+        private JObject? Audit_AddAttributeInfo(EvaluationItem attributeEvaluationItem, JObject parent)
         {
             JObject? auditNode = null;
 
             try
             {
-                List<PIQISAM> attributePIQISAMList = null;
-                if (entity == null)
-                {
-                    attributePIQISAMList = SAMDict.Values
-                    .Where(ps => ps.EntityTypeMnemonic == attributeItem.ClassEntity.Mnemonic && ps.EntitySequence == attributeItem.ElementSequence && ps.EntityMnemonic == attributeItem.Mnemonic)
-                    .ToList();
-                }
-                else
-                {
-                    attributePIQISAMList = SAMDict.Values
-                    .Where(ps => ps.EntityTypeMnemonic == attributeItem.ClassEntity.Mnemonic && ps.EntitySequence == attributeItem.ElementSequence && ps.EntityMnemonic == entity.Mnemonic)
-                    .ToList();
-                }
+                List<EvaluationResult> attributeEvaluationResultList = EvaluationManager.EvaluationResultDict.Values
+                .Where(er => er.EvaluationItem == attributeEvaluationItem).ToList();
 
-                if (attributePIQISAMList.Count > 0)
+                if (attributeEvaluationResultList.Count > 0)
                 {
                     auditNode = Utility.JSON_AddObject(parent, "attributeAudit");
                     JObject attributeNode = Utility.JSON_AddObject(auditNode, "scoringData");
@@ -373,17 +328,17 @@ namespace PIQI_Engine.Server.Models
                     int numeratorWeight = 0;
                     int criticalFailureCount = 0;
 
-                    foreach (PIQISAM result in attributePIQISAMList
-                                 .Where(ps => !ps.IsDependency && !ps.IsCondition)
-                                 .OrderBy(ps => ps.EntityMnemonic).ThenBy(ps => ps.SAMName))
+                    foreach (EvaluationResult result in attributeEvaluationResultList
+                                 .Where(er => !er.IsDependent && !er.IsConditional)
+                                 .OrderBy(er => er.EntityMnemonic).ThenBy(er => er.SamDisplayName))
                     {
-                        JObject attrNode = result.IsScoring? Utility.JSON_AddObject(assessmentNode) : Utility.JSON_AddObject(informationalNode);
+                        JObject attrNode = result.IsScoring ? Utility.JSON_AddObject(assessmentNode) : Utility.JSON_AddObject(informationalNode);
                         attrNode.Add("attributeMnemonic", result.EntityMnemonic);
-                        attrNode.Add("attributeName", result.Entity?.FieldName ?? result.Entity?.Name ?? "");
-                        attrNode.Add("assessment", result.EvaluationCriteriaSAMNameOverride ?? RefData.GetSAM(result.SAMMnemonic ?? "")?.Name ?? result.SAMMnemonic);
+                        attrNode.Add("attributeName", result.EntityName ?? "");
+                        attrNode.Add("assessment", result.SamDisplayName ?? RefData.GetSAM(result.SamMnemonic ?? "")?.Name ?? result.SamMnemonic);
                         attrNode.Add("effect", result.IsScoring ? "Scoring" : "Informational");
 
-                        if (result.ProcessingState == SAMProcessStateEnum.Passed)
+                        if (result.EvalPassed)
                         {
                             attrNode.Add("status", "Passed");
                             if (result.IsScoring)
@@ -395,15 +350,18 @@ namespace PIQI_Engine.Server.Models
                             }
                             attrNode.Add("reason", "");
                         }
-                        else if (result.ProcessingState == SAMProcessStateEnum.Skipped)
+                        else if (result.EvalSkipped)
                         {
                             attrNode.Add("status", "Skipped");
-                            attrNode.Add("reason", RefData.GetSAM(result.SkipSAMMnemonic ?? "")?.Name ?? result.SkipSAMMnemonic);
+                            attrNode.Add("reason", result.Reason ?? (RefData.GetSAM(result.SkipSamMnemonic ?? "")?.FailName ?? RefData.GetSAM(result.SkipSamMnemonic ?? "")?.Name));
                         }
-                        else if (result.ProcessingState == SAMProcessStateEnum.Failed)
+                        else if (result.EvalFailed)
                         {
                             attrNode.Add("status", "Failed");
-                            attrNode.Add("reason", RefData.GetSAM(result.FailSAMMnemonic ?? "")?.Name ?? result.FailSAMMnemonic);
+                            attrNode.Add("reason", result.Reason ?? 
+                                (result.FailSamMnemonic == result.Criterion.SAMMnemonic ? 
+                                (result.Criterion.FailureNameOverride ?? result.Criterion.SamNameOverride ?? RefData.GetSAM(result.FailSamMnemonic ?? "")?.FailName ?? RefData.GetSAM(result.FailSamMnemonic ?? "")?.Name) : 
+                                (RefData.GetSAM(result.FailSamMnemonic ?? "")?.FailName ?? RefData.GetSAM(result.FailSamMnemonic ?? "")?.Name)));
                             if (result.IsScoring)
                             {
                                 denominator++;
@@ -432,67 +390,36 @@ namespace PIQI_Engine.Server.Models
 
         #endregion
 
+        #region Criteria 
+
+        /// <summary>
+        /// Retrieves all evaluation criteria that match the specified entity mnemonic from the reference data.
+        /// </summary>
+        /// <param name="entityMnemonic">
+        /// The mnemonic identifier of the entity used to filter evaluation criteria.
+        /// </param>
+        /// <returns>
+        /// A <see cref="List{EvaluationCriterion}"/> containing all criteria associated with the specified entity.
+        /// Returns an empty list if no matching criteria are found.
+        /// </returns>
+        public List<EvaluationCriterion> GetCriteriaList(string entityMnemonic)
+        {
+            return RefData.EvaluationRubric.Criteria.Where(c => c.Entity.Equals(entityMnemonic)).ToList();
+        }
+
+        #endregion
+
         #region SAMs
-
-        /// <summary>
-        /// Retrieves a PIQI SAM from the SAM dictionary based on entity, sequence, and SAM mnemonic.
-        /// </summary>
-        /// <param name="entityMnemonic">Entity mnemonic.</param>
-        /// <param name="entitySequence">Entity sequence number.</param>
-        /// <param name="criterionSequence">Criterion sequence number.</param>
-        /// <param name="samMnemonic">SAM mnemonic.</param>
-        /// <returns>The PIQI SAM if found; otherwise null.</returns>
-        public PIQISAM? GetPIQISAM(string entityMnemonic, int entitySequence, int criterionSequence, string samMnemonic)
-        {
-            try
-            {
-                string key = $"{entityMnemonic}|{entitySequence}|{criterionSequence}|{samMnemonic}";
-                return SAMDict.TryGetValue(key, out var piqiSam) ? piqiSam : null;
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Gets an existing PIQI SAM or creates a new one if it does not exist.
-        /// </summary>
-        /// <param name="entity">The entity associated with the SAM.</param>
-        /// <param name="sam">The SAM definition.</param>
-        /// <param name="classMnemonic">The mnemonic of the entity's class.</param>
-        /// <param name="entitySequence">Sequence number.</param>
-        /// <param name="evaluationCriterion">The evaluation criterion.</param>
-        /// <returns>The existing or newly created PIQI SAM.</returns>
-        public PIQISAM AddPIQISAM(Entity entity, SAM sam, string classMnemonic, int entitySequence, EvaluationCriterion evaluationCriterion)
-        {
-            try
-            {
-                PIQISAM? piqiSam = GetPIQISAM(entity.Mnemonic, entitySequence, evaluationCriterion.Sequence, sam.Mnemonic);
-                if (piqiSam == null)
-                {
-                    piqiSam = new PIQISAM(entity, sam, classMnemonic, entitySequence, evaluationCriterion);
-                    SAMDict.Add(piqiSam.SAMKey, piqiSam);
-                }
-                return piqiSam;
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        #region SAM Worker
 
         /// <summary>
         /// Returns the appropriate SAM worker instance for a given SAM mnemonic.
         /// </summary>
         /// <param name="mnemonic">The SAM mnemonic.</param>
-        /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to make FHIR API calls.
+        /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to make FHIR API calls.
         /// </param>
         /// <returns>The SAM worker instance, or null if not found.</returns>
-        public SAMBase GetSAMWorker(string mnemonic, SAMReferenceDataService referenceDataService)
+        public SAMBase GetSAMWorker(string mnemonic, SAMService samService)
         {
             try
             {
@@ -503,39 +430,40 @@ namespace PIQI_Engine.Server.Models
                 // Map mnemonics to SAM worker implementations
                 return mnemonic switch
                 {
-                    "Attr_IsPopulated" => new SAM_AttrIsPopulated(sam, referenceDataService),
-                    "Attr_IsNumeric" => new SAM_AttrIsNumeric(sam, referenceDataService),
-                    "Attr_IsInteger" => new SAM_AttrIsInteger(sam, referenceDataService),
-                    "Attr_IsDecimal" => new SAM_AttrIsDecimal(sam, referenceDataService),
-                    "Attr_IsPositiveNumber" => new SAM_AttrIsPositiveNumber(sam, referenceDataService),
-                    "Attr_IsNegativeNumber" => new SAM_AttrIsNegativeNumber(sam, referenceDataService),
-                    "Attr_IsDate" => new SAM_AttrIsDate(sam, referenceDataService),
-                    "Attr_IsFutureDate" => new SAM_AttrIsFutureDate(sam, referenceDataService),
-                    "Attr_IsPastDate" => new SAM_AttrIsPastDate(sam, referenceDataService),
-                    "Attr_IsTime" => new SAM_AttrIsTime(sam, referenceDataService),
-                    "Attr_IsTimestamp" => new SAM_AttrIsTimestamp(sam, referenceDataService),
-                    "Attr_IsTimestampTz" => new SAM_AttrIsTimestampTz(sam, referenceDataService),
-                    "Attr_MatchesRegex" => new SAM_AttrMatchesRegex(sam, referenceDataService),
-                    "Attr_InList" => new SAM_AttrIsInList(sam, referenceDataService),
-                    "Attr_InExternalList" => new SAM_AttrIsInExternalList(sam, referenceDataService),
-                    "Concept_HasCode" => new SAM_ConceptHasCode(sam, referenceDataService),
-                    "Concept_HasCodeSystem" => new SAM_ConceptHasCodeSystem(sam, referenceDataService),
-                    "Concept_HasDisplay" => new SAM_ConceptHasDisplay(sam, referenceDataService),
-                    "Concept_HasRecognizedCodeSystem" => new SAM_ConceptHasRecognizedCodeSystem(sam, referenceDataService),
-                    "Concept_IsComplete" => new SAM_ConceptIsComplete(sam, referenceDataService),
-                    "Concept_IsValid" => new SAM_ConceptIsValid(sam, referenceDataService),
-                    "Concept_IsValidMember" => new SAM_ConceptIsValidMember(sam, referenceDataService),
-                    "Concept_IsConsistent" => new SAM_ConceptIsConsistent(sam, referenceDataService),
-                    "Concept_IsActive" => new SAM_ConceptIsActive(sam, referenceDataService),
-                    "Custom_External_Assessment" => new SAM_CustomExternalAssessment(sam, referenceDataService),
-                    "ObservationValueType_InList" => new SAM_ValueTypeInList(sam, referenceDataService),
-                    "ObservationValue_MatchesType" => new SAM_ValueMatchesType(sam, referenceDataService),
-                    "ObservationValue_IsQualitative" => new SAM_ValueIsQualitative(sam, referenceDataService),
-                    "RangeValue_IsComplete" => new SAM_RangeValueIsComplete(sam, referenceDataService),
-                    "RangeValue_IsValid" => new SAM_RangeValueIsValid(sam, referenceDataService),
-                    "Attr_IsCoded" => new SAM_AttrIsCoded(sam, referenceDataService),
-                    "Eval_IsValid" => new SAM_EvalIsValid(sam, referenceDataService),
-                    _ => new SAM_Default(sam, referenceDataService)
+                    "ATTR_ISPOPULATED" => new SAM_AttrIsPopulated(sam, samService),
+                    "ATTR_ISNUMERIC" => new SAM_AttrIsNumeric(sam, samService),
+                    "ATTR_ISINTEGER" => new SAM_AttrIsInteger(sam, samService),
+                    "ATTR_ISDECIMAL" => new SAM_AttrIsDecimal(sam, samService),
+                    "ATTR_ISPOSITIVENUMBER" => new SAM_AttrIsPositiveNumber(sam, samService),
+                    "ATTR_ISNEGATIVENUMBER" => new SAM_AttrIsNegativeNumber(sam, samService),
+                    "ATTR_ISDATE" => new SAM_AttrIsDate(sam, samService),
+                    "ATTR_ISFUTUREDATE" => new SAM_AttrIsFutureDate(sam, samService),
+                    "ATTR_ISPASTDATE" => new SAM_AttrIsPastDate(sam, samService),
+                    "ATTR_ISTIME" => new SAM_AttrIsTime(sam, samService),
+                    "ATTR_ISTIMESTAMP" => new SAM_AttrIsTimestamp(sam, samService),
+                    "ATTR_ISTIMESTAMPTZ" => new SAM_AttrIsTimestampTz(sam, samService),
+                    "ATTR_MATCHESREGEX" => new SAM_AttrMatchesRegex(sam, samService),
+                    "ATTR_INLIST" => new SAM_AttrIsInList(sam, samService),
+                    "ATTR_INEXTERNALLIST" => new SAM_AttrIsInExternalList(sam, samService),
+                    "CONCEPT_HASCODE" => new SAM_ConceptHasCode(sam, samService),
+                    "CONCEPT_HASCODESYSTEM" => new SAM_ConceptHasCodeSystem(sam, samService),
+                    "CONCEPT_HASDISPLAY" => new SAM_ConceptHasDisplay(sam, samService),
+                    "CONCEPT_HASRECOGNIZEDCODESYSTEM" => new SAM_ConceptHasRecognizedCodeSystem(sam, samService),
+                    "CONCEPT_ISCOMPLETE" => new SAM_ConceptIsComplete(sam, samService),
+                    "CONCEPT_ISINVALUESET" => new SAM_ConceptIsInValueSet(sam, samService),
+                    "CONCEPT_ISVALID" => new SAM_ConceptIsValid(sam, samService),
+                    "CONCEPT_ISVALIDMEMBER" => new SAM_ConceptIsValidMember(sam, samService),
+                    "CONCEPT_ISCONSISTENT" => new SAM_ConceptIsConsistent(sam, samService),
+                    "CONCEPT_ISACTIVE" => new SAM_ConceptIsActive(sam, samService),
+                    "Custom_External_Assessment" => new SAM_CustomExternalAssessment(sam, samService),
+                    "OBSERVATIONVALUETYPE_INLIST" => new SAM_ValueTypeInList(sam, samService),
+                    "OBSERVATIONVALUE_MATCHESTYPE" => new SAM_ValueMatchesType(sam, samService),
+                    "OBSERVATIONVALUE_ISQUALITATIVE" => new SAM_ValueIsQualitative(sam, samService),
+                    "RANGEVALUE_ISCOMPLETE" => new SAM_RangeValueIsComplete(sam, samService),
+                    "RANGEVALUE_ISVALID" => new SAM_RangeValueIsValid(sam, samService),
+                    "ATTR_ISCODED" => new SAM_AttrIsCoded(sam, samService),
+                    "EVAL_ISVALID" => new SAM_EvalIsValid(sam, samService),
+                    _ => new SAM_Default(sam, samService)
                 };
             }
             catch
@@ -543,8 +471,6 @@ namespace PIQI_Engine.Server.Models
                 throw;
             }
         }
-
-        #endregion
 
         #endregion
 

@@ -14,21 +14,31 @@
         /// <summary>
         /// A regular expression (Regex) pattern.
         /// </summary>
-        Regex = 2,
+        REGEX = 2,
 
         /// <summary>
         /// A single value or item.
         /// </summary>
-        Single = 3,
+        SINGLE = 3,
 
         /// <summary>
         /// A single object with structured data.
         /// </summary>
-        Object = 4,
+        OBJECT = 4,
 
         /// <summary>
         /// A collection of structured objects.
         /// </summary>
-        Objects = 5
+        OBJECTS = 5,
+
+        /// <summary>
+        /// A collection of structured objects.
+        /// </summary>
+        VAL_SET = 6,
+
+        /// <summary>
+        /// A collection of structured objects.
+        /// </summary>
+        RNG_SET = 7
     }
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
 
 namespace PIQI_Engine.Server.Controllers;
@@ -19,7 +18,6 @@ public class DiagnosticsController : ControllerBase
     /// </returns>
     [Route("status")]
     [HttpGet]
-    [AllowAnonymous]
     public ActionResult<string> CheckHealth() => Ok("OK");
 
     /// <summary>
@@ -31,7 +29,6 @@ public class DiagnosticsController : ControllerBase
     /// </returns>
     [Route("version")]
     [HttpGet]
-    [AllowAnonymous]
     public ActionResult<string> GetVersionInfo() =>
         Ok(Assembly.GetExecutingAssembly().GetName()?.Version?.ToString());
 }

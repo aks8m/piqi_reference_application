@@ -33,7 +33,7 @@ namespace PIQI_Engine.Server.Engines
         /// <summary>
         /// Service used in the SAMs to access reference data such as code systems.
         /// </summary>
-        protected readonly SAMReferenceDataService _SAMReferenceDataService;
+        protected readonly SAMService _SAMService;
 
         /// <summary>
         /// Engine for managing reference data, such as lookups and domain-specific information.
@@ -51,20 +51,20 @@ namespace PIQI_Engine.Server.Engines
         /// <param name="configuration">The application configuration.</param>
         /// <param name="logger">The logger instance.</param>
         /// <param name="cache">The file cache service.</param>
-        /// <param name="referenceDataService">The reference data service used in the SAMs.</param>
+        /// <param name="samService">The reference data service used in the SAMs.</param>
         /// <param name="referenceDataEngine">The engine used for handling reference data.</param>
         public PIQIEngine(
             IConfiguration configuration,
             ILogger<PIQIEngine> logger,
             FileCacheService cache,
-            SAMReferenceDataService referenceDataService,
+            SAMService samService,
             ReferenceDataEngine referenceDataEngine
             )
         {
             _Configuration = configuration;
             _Logger = logger;
             _Cache = cache;
-            _SAMReferenceDataService = referenceDataService;
+            _SAMService = samService;
             _ReferenceDataEngine = referenceDataEngine;
         }
 
@@ -75,9 +75,10 @@ namespace PIQI_Engine.Server.Engines
         /// </summary>
         /// <param name="piqiRequest">The request object containing the PIQI message details.</param>
         /// <param name="auditMode">Indicates whether the request should generate an audited result.</param>
+        /// <param name="evaluation">Optional evaluation file to override or supplement evaluation rubrics.</param>
         /// <returns>A <see cref="PIQIResponse"/> containing the processed message, formatted statistics, and optionally the audited message.</returns>
         /// <exception cref="Exception">Thrown if the message processing fails, reference data cannot be loaded, or validation fails.</exception>
-        public async Task<PIQIResponse> PiqiRequestAsync(PIQIRequest piqiRequest, bool auditMode)
+        public async Task<PIQIResponse> PiqiRequestAsync(PIQIRequest piqiRequest, bool auditMode, IFormFile? evaluation = null) 
         {
             // Create final result object
             PIQIResponse result = new PIQIResponse();
@@ -95,15 +96,15 @@ namespace PIQI_Engine.Server.Engines
                 message.MessageModel = headerResult;
 
                 //Load reference data: Code system dictionary, Sam list, Entity list, Entity Type list, Criteria list, Value list, and Data Type list
-                PIQIReferenceData refDataResult = _ReferenceDataEngine.LoadRefData(piqiRequest.EvaluationRubricMnemonic);
+                PIQIReferenceData refDataResult = _ReferenceDataEngine.LoadRefData(piqiRequest.EvaluationRubricMnemonic, evaluation);
                 if (refDataResult == null) throw new Exception("Failed to load reference data.");
                 message.RefData = refDataResult;
-                _SAMReferenceDataService.ReferenceData = refDataResult;
+
+                if (evaluation != null && message.RefData.EvaluationRubric.Mnemonic != null) piqiRequest.EvaluationRubricMnemonic = message.RefData.EvaluationRubric.Mnemonic;
 
                 // Explicitly set Data Type List, Entity Model, and root information to be used when loading messageData content
                 message.MessageModel.DataTypeList = refDataResult.DataTypeList;
                 message.MessageModel.EntityModel = refDataResult.EntityModel;
-                message.MessageModel.RootEntityFieldName = refDataResult.Model.RootEntityFieldName;
                 message.MessageModel.RootEntityName = refDataResult.Model.RootEntityName;
 
                 // Get evaluation rubric from evaluation mnemonic and apply it to the message
@@ -112,16 +113,19 @@ namespace PIQI_Engine.Server.Engines
 
                 // Validate the input entity model version mnemonic against the evaluation
                 ValidateEntityModelVersionMnemonic(evaluationRubric, piqiRequest.PIQIModelMnemonic);
-                message.EvaluationRubric = evaluationRubric;
+                message.RefData.EvaluationRubric = evaluationRubric;
 
                 // Load the message content  
                 MessageModelBuilder.LoadContent(message.MessageModel, message.RefData);
+
+                // Set the message to be used in the SAMs (needed for reference data)
+                _SAMService.Message = message;
 
                 // Process the message
                 await ProcessMessageAsync(message);
 
                 // Generate stats
-                StatMethodResult statResponse = message.GenerateStatResponse();
+                StatResponse statResponse = message.GenerateStatResponse();
 
                 // Format the information from the stat response into a PIQI stat response
                 PIQIStatResponse formattedStatResponse = new PIQIStatResponse(statResponse, message);
@@ -147,62 +151,10 @@ namespace PIQI_Engine.Server.Engines
             return result;
         }
 
-        // Iterates through the evaluation rubric and processes each criterion
-        private async Task ProcessMessageAsync(PIQIMessage message)
-        {
-            try
-            {
-                // Sort evaluation criteria by sequence
-                List<EvaluationCriterion> orderedEvaluationCriteria = message.EvaluationRubric.Criteria.OrderBy(ec => ec.Sequence).ToList();
-
-                // Cycle through evaluation criteria
-                foreach (EvaluationCriterion evaluationCriterion in orderedEvaluationCriteria)
-                {
-                    // Get the entity and class key for the entity mnemonic in the evaluation criterion
-                    Entity? criteriaEntity = message.RefData.GetEntity(evaluationCriterion.Entity);
-                    Entity? criteriaClassEntity = message.RefData.GetEntityClass(evaluationCriterion.Entity);
-                    string? criteriaElementMnemonic = criteriaClassEntity?.Children?.FirstOrDefault()?.Mnemonic;
-
-                    if (criteriaEntity == null || criteriaClassEntity == null || criteriaElementMnemonic == null) throw new Exception("Failed to load entity from evaluation criterion.");
-                    string classKey = $"{message.RefData.Model.RootEntityMnemonic}|{criteriaClassEntity.Mnemonic}";
-                    
-                    // Get the relevant entities based on the datatype
-                    switch (criteriaEntity.DataTypeID)
-                    {
-                        case EntityDataTypeEnum.ROOT:
-                            throw new Exception("Not implemented - model entity in criteria");
-                        case EntityDataTypeEnum.CLS:
-                            throw new Exception("Not implemented - class entity in criteria");
-                        case EntityDataTypeEnum.ELM:
-                            throw new Exception("Not implemented - element entity in criteria");
-                        default:
-                            // Get the total number of atrtributes to iterate through
-                            int attributeTotal = message.MessageModel.ClassDict.TryGetValue(classKey, out MessageModelItem? classValue) ? classValue.ChildDict.Count : 0;
-
-                            //For each element in the given class, process the SAM on the message model item representing the attribute
-                            for (int entitySequence = 1; entitySequence <= attributeTotal; entitySequence++)
-                            {
-                                // Get attribute key from classKey, parent mnemonic, sequence, and criteria entity mnemonic and use it to get the message model item from AttrDict
-                                string attributeKey = $"{classKey}|{criteriaElementMnemonic}.{entitySequence}|{evaluationCriterion.Entity}";
-                                MessageModelItem messageModelItem = message.MessageModel.AttrDict.TryGetValue(attributeKey, out MessageModelItem? attrValue) ? attrValue : null;
-                                
-                                // Now that we have the message model item, process the criteria
-                                PIQISAM processResult = await ProcessCriteriaSAMAsync(message, messageModelItem, evaluationCriterion, entitySequence);
-                                if (processResult == null)
-                                    throw new Exception("Evaluation criterion processing failed.");
-                            }
-                            break;
-                    }
-                }
-            }
-            catch
-            {
-                throw;
-            }
-        }
         #endregion
 
         #region Validation
+        // Validates the message model against the evaluation rubric model
         private void ValidateEntityModelVersionMnemonic(EvaluationRubric evaluationRubric, string messagePIQIModelMnemonic)
         {
             try
@@ -243,70 +195,20 @@ namespace PIQI_Engine.Server.Engines
         }
         #endregion
 
-        #region SAM Processing
-        //  Validates the SAM parameters, triggers the conditional SAM and its dependencies, then triggers the evaluation criteria SAM and its dependencies
-        private async Task<PIQISAM> ProcessCriteriaSAMAsync(PIQIMessage message, MessageModelItem messageModelItem, EvaluationCriterion evaluationCriterion, int entitySequence)
+        #region Message Processing
+        // Creates the evaluation manager from the messag emodel and processes the message
+        private async Task ProcessMessageAsync(PIQIMessage message)
         {
             try
             {
-                // Get entity from evaluation criterion
-                Entity? entity = message.RefData.GetEntity(evaluationCriterion.Entity);
-                if (entity == null)
-                    throw new Exception($"Criteria entity{(evaluationCriterion.Entity != null ? " (" + evaluationCriterion.Entity + ")" : "")} missing from entity reference list or invalid.");
-                string? classMnemonic = message.RefData.GetEntityClass(evaluationCriterion.Entity)?.Mnemonic;
-                if (classMnemonic == null)
-                {
-                    _Logger.Log(LogLevel.Warning, $"Invalid class entity for evaluation criteria: {evaluationCriterion.Description}.");
-                    classMnemonic = entity.Mnemonic.Split('.')[0];
-                }
-                // Get SAM from evaluation criterion
-                SAM? criteriaSAM = message.RefData.GetSAM(evaluationCriterion.SAMMnemonic);
-                if (criteriaSAM == null)
-                    throw new Exception($"Criteria SAM{(evaluationCriterion.SAMMnemonic != null ? " (" + evaluationCriterion.SAMMnemonic + ")" : "")} missing from SAM reference list or invalid.");
+                // Build the eval model
+                message.EvaluationManager.Load(message.RefData.EntityModel, message.MessageModel);
 
-                // Create PIQISAM item for processing
-                PIQISAM processingPIQISAM = message.AddPIQISAM(entity, criteriaSAM, classMnemonic, entitySequence, evaluationCriterion);
-                // Check if evaluation in the evaluation criteria is valid, skip if not
-                SAM? evalValidSam = message.RefData.GetSAM("Eval_IsValid");
-                if (evalValidSam == null)
-                    throw new Exception($"Evaluation validity SAM (Eval_IsValid missing) from SAM reference list or invalid.");
+                // Get the root eval item
+                EvaluationItem rootEvalItem = message.EvaluationManager.RootItem;
 
-                if (!EvalIsValid(evaluationCriterion, criteriaSAM))
-                {
-                    _Logger.Log(LogLevel.Warning, $"Invalid evaluation criteria: {evaluationCriterion.Description}");
-                    processingPIQISAM.Skip(evalValidSam.Mnemonic);
-                }
-                // Check for a conditional SAM if processing state is still pending. If conditional SAM exists, process it prior to running the SAM in the evaluation criteria
-                if (processingPIQISAM.ProcessingState == SAMProcessStateEnum.Pending && evaluationCriterion.ConditionalSAM != null)
-                {
-                    // Get class mnemonic to create PIQI SAM
-                    string? conditionalClassMnemonic = message.RefData.GetEntityClass(processingPIQISAM.Entity.Mnemonic)?.Mnemonic;
-                    if (conditionalClassMnemonic == null)
-                    {
-                        _Logger.Log(LogLevel.Warning, $"Invalid conditional class entity for evaluation criteria: {evaluationCriterion.Description}.");
-                        conditionalClassMnemonic = processingPIQISAM.Entity.Mnemonic.Split('.')[0];
-                    }
-
-                    // Get conditional SAM from evaluation criterion
-                    PIQISAM conditionalProcessingSAM = new PIQISAM(processingPIQISAM.Entity, criteriaSAM, conditionalClassMnemonic, processingPIQISAM.EntitySequence);
-
-                    // Process conditional SAM and its prerequisites
-                    await ProcessSAMAsync(message, conditionalProcessingSAM, messageModelItem, evaluationCriterion.ConditionalSAM, true);
-
-                    // Skip current criteria SAM if conditional SAM fails
-                    if (conditionalProcessingSAM.ProcessingState == SAMProcessStateEnum.Failed)
-                    {
-                        processingPIQISAM.Skip(evaluationCriterion.ConditionalSAM);
-                    }
-                }
-                // Check if processing state is still pending. Process this SAM if so
-                if (processingPIQISAM.ProcessingState == SAMProcessStateEnum.Pending)
-                {
-                    await ProcessSAMAsync(message, processingPIQISAM, messageModelItem, criteriaSAM.Mnemonic, false);
-                }
-
-                // No exceptions means the method succeeded
-                return processingPIQISAM;
+                // Process its children (all classes, elements and attrs)
+                await ProcessRootAsync(message, rootEvalItem);
             }
             catch
             {
@@ -314,13 +216,150 @@ namespace PIQI_Engine.Server.Engines
             }
         }
 
-
-        // Used to manage prerequisite SAMs for either the evaluation criteria SAM or the conditional SAM
-        // Takes in either the criteria's prerequisite SAM or the conditional SAM 
-        private async Task ProcessSAMAsync(PIQIMessage message, PIQISAM initialProcessingPIQISAM, MessageModelItem messageModelItem, string initalSAMMNemonic, bool isConditional)
+        // Loops through all class level evaluation items then processes all root level criteria
+        private async Task ProcessRootAsync(PIQIMessage message, EvaluationItem rootEvaluationItem)
         {
             try
             {
+                // Process all root classes
+                foreach (EvaluationItem classEvalItem in rootEvaluationItem.ChildDict.Values.OrderBy(t => t.Entity.Name))
+                {
+                    await ProcessClassAsync(message, classEvalItem);
+                }
+
+                // Process any criteria on the root itself
+                // Get criteria
+                List<EvaluationCriterion> critList = message.GetCriteriaList(rootEvaluationItem.Entity.Mnemonic);
+
+                foreach (EvaluationCriterion criterion in critList.OrderBy(t => t.Sequence))
+                {
+                    await ProcessCriteriaSAMAsync(message, rootEvaluationItem, criterion);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        // Loops through all element level evaluation items then processes all class level criteria
+        private async Task ProcessClassAsync(PIQIMessage message, EvaluationItem classEvaluationItem)
+        {
+            try
+            {
+                // Process class elements
+                foreach (EvaluationItem elementEvalItem in classEvaluationItem.ChildDict.Values.OrderBy(t => t.ElementSequence))
+                {
+                    await ProcessElementAsync(message, elementEvalItem);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        // Loops through all attribute level evaluation items, there are no element level criteria to process
+        private async Task ProcessElementAsync(PIQIMessage message, EvaluationItem elementEvaluationItem)
+        {
+            try
+            {
+                // Process element attrs
+                foreach (EvaluationItem attrEvalItem in elementEvaluationItem.ChildDict.Values.OrderBy(t => t.Entity.Name))
+                {
+                    await ProcessAttributeAsync(message, attrEvalItem);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        // Loops through all attribute level criteria and processes them
+        private async Task ProcessAttributeAsync(PIQIMessage message, EvaluationItem attributeEvaluationItem)
+        {
+            try
+            {
+                // Get criteria for this attribute
+                List<EvaluationCriterion> critList = message.GetCriteriaList(attributeEvaluationItem.Entity.Mnemonic);
+
+                foreach (EvaluationCriterion criterion in critList.OrderBy(t => t.Sequence))
+                {
+                    await ProcessCriteriaSAMAsync(message, attributeEvaluationItem, criterion);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        //  Validates the SAM parameters, triggers the conditional SAM and its dependencies, then triggers the evaluation criteria SAM and its dependencies
+        private async Task ProcessCriteriaSAMAsync(PIQIMessage message, EvaluationItem evaluationItem, EvaluationCriterion evaluationCriterion)
+        {
+            try
+            {
+                // Get SAM from evaluation criterion
+                SAM? criteriaSAM = message.RefData.GetSAM(evaluationCriterion.SAMMnemonic);
+                if (criteriaSAM == null)
+                    throw new Exception($"Criteria SAM{(evaluationCriterion.SAMMnemonic != null ? " (" + evaluationCriterion.SAMMnemonic + ")" : "")} missing from SAM reference list or invalid.");
+
+                // Create the evaluation result from the sam, criterion, and evaluation item
+                EvaluationResult evaluationResult = message.EvaluationManager.CreateEvalResult(evaluationItem, evaluationCriterion, criteriaSAM, false, false);
+
+                // Check if evaluation in the evaluation criteria is valid, skip if not
+                SAM? evalValidSam = message.RefData.GetSAM("EVAL_ISVALID");
+                if (evalValidSam == null)
+                    throw new Exception($"Evaluation validity SAM (EVAL_ISVALID missing) from SAM reference list or invalid.");
+
+                if (!EvalIsValid(evaluationCriterion, criteriaSAM))
+                {
+                    _Logger.Log(LogLevel.Warning, $"Invalid evaluation criteria: {evaluationCriterion.Description}");
+                    evaluationResult.Skip(evalValidSam);
+                }
+
+                // Check for a conditional SAM if processing state is still pending. If conditional SAM exists, process it prior to running the SAM in the evaluation criteria
+                if (evaluationResult.EvalPending && evaluationCriterion.ConditionalSAM != null)
+                {
+                    // Get SAM from evaluation criterion
+                    SAM? conditionalCriteriaSAM = message.RefData.GetSAM(evaluationCriterion.ConditionalSAM);
+                    if (conditionalCriteriaSAM == null)
+                        throw new Exception($"Conditional SAM{(evaluationCriterion.ConditionalSAM != null ? " (" + evaluationCriterion.ConditionalSAM + ")" : "")} missing from SAM reference list or invalid.");
+
+                    // Create the conditional evaluation result
+                    EvaluationResult conditionalEvaluationResult = new EvaluationResult(evaluationItem, evaluationCriterion, conditionalCriteriaSAM, true, false);
+
+                    // Process conditional SAM and its prerequisites
+                    await ProcessSAMAsync(message, conditionalEvaluationResult, evaluationCriterion.ConditionalSAM, true);
+
+                    // Skip current criteria SAM if conditional SAM fails
+                    if (conditionalEvaluationResult.EvalFailed)
+                        evaluationResult.Skip(conditionalCriteriaSAM, conditionalEvaluationResult.Reason);
+                }
+
+                // Check if processing state is still pending. Process this SAM if so
+                if (evaluationResult.EvalPending)
+                {
+                    await ProcessSAMAsync(message, evaluationResult, criteriaSAM.Mnemonic, false);
+                }
+
+                // Add the result to our hash
+                evaluationResult.EvaluationItem.AddFullResult(evaluationResult);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        #region SAM Processing
+        // Gets evualation parameters and then processes the SAM and its dependencies
+        private async Task ProcessSAMAsync(PIQIMessage message, EvaluationResult evaluationResult, string initalSAMMNemonic, bool isConditional)
+        {
+            try
+            {
+                if (evaluationResult == null) throw new Exception("Invalid evaluation result item.");
                 // Stack of SAMs used to process the prerequisite SAMs in order
                 Stack<SAM> dependencySAMStack = new Stack<SAM>();
                 var dependencySAMMnemonic = initalSAMMNemonic;
@@ -349,13 +388,11 @@ namespace PIQI_Engine.Server.Engines
                     string? evaluationCriteriaProcessingURL = null;
                     string? dataMnemonic = null;
                     // Check for parameters (only necesary if the SAM is not dependent)
-                    if (messageModelItem != null && processingSAM.Parameters != null && processingSAM.Parameters.Count > 0 && processingSAM.Mnemonic == initalSAMMNemonic)
+                    if (processingSAM.Parameters != null && processingSAM.Parameters.Count > 0 && processingSAM.Mnemonic == initalSAMMNemonic)
                     {
                         // Get the evaluation criteria and evaluation criteria parameters
-                        EvaluationCriterion? evaluationCriterion = message.RefData.GetEvaluationCriterion(message.EvaluationRubric, messageModelItem.Mnemonic, processingSAM.Mnemonic, initialProcessingPIQISAM.CriterionSequence, isConditional);
-                        if (evaluationCriterion == null) throw new Exception("Missing or invalid evaluation criterion.");
-                        evaluationCriteriaParameters = isConditional ? evaluationCriterion.ConditionalSAMParameters?.ToList() : evaluationCriterion.SAMParameters?.ToList();
-                        evaluationCriteriaProcessingURL = evaluationCriterion?.ProcessingURL;
+                        evaluationCriteriaParameters = isConditional ? evaluationResult.Criterion?.ConditionalSAMParameters?.ToList() : evaluationResult.Criterion?.SAMParameters?.ToList();
+                        evaluationCriteriaProcessingURL = evaluationResult.Criterion?.ProcessingURL;
 
                         // Get the dataMnemonic specified in the param, if necessary
                         if (processingSAM.Mnemonic == "attr_is_in_value_list")
@@ -367,8 +404,9 @@ namespace PIQI_Engine.Server.Engines
                     // If we're using value data, ensure the appropriate data is loaded
                     if (!string.IsNullOrEmpty(dataMnemonic) && message.RefData.GetValueList(dataMnemonic) == null)
                         throw new Exception("Failed to load value data for [" + dataMnemonic + "]");
+
                     // Get the executable SAM
-                    SAMBase samWorker = message.GetSAMWorker(processingSAM.Mnemonic, _SAMReferenceDataService);
+                    SAMBase samWorker = message.GetSAMWorker(processingSAM.Mnemonic, _SAMService);
 
                     // If we got the default sam, log that
                     if (samWorker.SAMObject.Mnemonic == "default")
@@ -378,7 +416,7 @@ namespace PIQI_Engine.Server.Engines
                     PIQISAMResponse? samResult = null;
 
                     // Create SAM request object
-                    samRequest.MessageObject = messageModelItem;
+                    samRequest.MessageObject = evaluationResult.EvaluationItem.MessageItem;
                     if (evaluationCriteriaParameters != null && evaluationCriteriaParameters.Count > 0)
                     {
                         // Add processing URL as a parameter
@@ -387,26 +425,12 @@ namespace PIQI_Engine.Server.Engines
                         for (int i = 0; i < evaluationCriteriaParameters.Count; i++)
                         {
                             EvaluationCriteriaParameter ecp = evaluationCriteriaParameters[i];
-                            SAMParameter? samParameter = samWorker.SAMObject.Parameters?.Where(t => t.Name == ecp.ParameterName).FirstOrDefault();
-                            if (samParameter == null || samParameter.Name == null || ecp.ParameterValue == null)
-                                _Logger.Log(LogLevel.Warning, $"Invalid SAM parameter object: {samParameter?.Name}, {ecp.ParameterValue}");
+                            SAMParameter? samParameter = samWorker.SAMObject.Parameters?.Where(t => t.Mnemonic == ecp.SamParameterMnemonic).FirstOrDefault();
+                            if (samParameter == null || samParameter.Mnemonic == null || ecp.ParameterValue == null)
+                                _Logger.Log(LogLevel.Warning, $"Invalid SAM parameter object in {evaluationResult.Criterion.Entity}: {samParameter?.Mnemonic}, {ecp.ParameterValue}");
                             else
                             {
-                                if (samParameter.ParameterType == SAMParameterTypeEnum.Object)
-                                {
-                                    var parameterValues = JsonConvert.DeserializeObject<JObject>(ecp.ParameterValue);
-                                    if (parameterValues == null) throw new Exception($"Invalid or missing parameter value(s): {ecp.ParameterName}");
-
-                                    // Loop through object and add each property as a new parameter
-                                    foreach (var property in parameterValues.Properties())
-                                    {
-                                        if (property == null || property.Name == null || property.Value == null)
-                                            throw new Exception($"Invalid property in {ecp.ParameterName} criteria parameter object");
-                                        samRequest.AddParameter(property.Name, property.Value.ToString());
-                                    }
-                                }
-                                else
-                                    samRequest.AddParameter(samParameter.Name, ecp.ParameterValue);
+                                samRequest.AddParameter(samParameter.Mnemonic, ecp.ParameterValue);
                             }
                         }
                     }
@@ -421,14 +445,14 @@ namespace PIQI_Engine.Server.Engines
                     // Fail the criteria SAM if it or one of its dependencies fails
                     if (samResult.Failed)
                     {
-                        initialProcessingPIQISAM.Fail(processingSAM.Mnemonic);
+                        evaluationResult.Fail(processingSAM, samResult.FailReason);
                         break;
                     }
 
                 }
 
                 // No exceptions means the method succeeded
-                if (initialProcessingPIQISAM.ProcessingState != SAMProcessStateEnum.Failed) initialProcessingPIQISAM.Pass();
+                if (evaluationResult.EvalResult != ProcessStateEnum.Failed) evaluationResult.Pass();
             }
             catch
             {
@@ -436,6 +460,7 @@ namespace PIQI_Engine.Server.Engines
             }
         }
 
+        // Validates the evaluation criteria by checking for necesary SAM parameters
         private bool EvalIsValid(EvaluationCriterion evaluationCriterion, SAM sam)
         {
             try
@@ -465,6 +490,8 @@ namespace PIQI_Engine.Server.Engines
                 throw;
             }
         }
+        #endregion
+
         #endregion
     }
 }

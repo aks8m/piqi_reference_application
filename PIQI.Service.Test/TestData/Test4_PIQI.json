@@ -1,6 +1,24 @@
 {
   "FormatID": "FHIR JSON",
   "MessageId": "3ce2c72d-d347-4fde-82cf-dc9992c73aad",
+  "ResourceCount": "8",
+  "AllergyCount": "0",
+  "CarePlanCount": "0",
+  "ClaimsCount": "0",
+  "ConditionCount": "0",
+  "DeviceCount": "0",
+  "DiagnosticReportCount": "0",
+  "DocumentReferenceCount": "0",
+  "EncounterCount": "1",
+  "GoalCount": "0",
+  "ImmunizationCount": "0",
+  "MedicationRequestCount": "0",
+  "MedicationStatementCount": "0",
+  "MedicationCount": "0",
+  "MedicationAdministrationCount": "0",
+  "MedicationDispenseCount": "0",
+  "ObservationCount": "1",
+  "ProcedureCount": "0",
   "Patient": {
     "Demographics": {
       "birthSex": {

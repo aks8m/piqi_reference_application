@@ -13,6 +13,6 @@
         /// <summary>
         /// The mnemonic identifier for the source.
         /// </summary>
-        public string Mnemonic { get; set; }
+        public string Mnemonic { get; set; } = null!;
     }
 }

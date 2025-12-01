@@ -49,8 +49,9 @@ namespace PIQI_Engine.Server.Engines
         /// Loads all reference data including code systems, SAMs, evaluation rubrics, data types, value lists, models, and entities.
         /// </summary>
         /// <param name="EvaluationRubricMnemonic">The mnemonic identifier of the evaluation rubric to load.</param>
+        /// <param name="evaluation">Optional file containing evaluation rubric JSON data.</param>
         /// <returns>A <see cref="PIQIReferenceData"/> containing the loaded reference data.</returns>
-        public PIQIReferenceData LoadRefData(string EvaluationRubricMnemonic)
+        public PIQIReferenceData LoadRefData(string EvaluationRubricMnemonic, IFormFile? evaluation)
         {
             try
             {
@@ -67,7 +68,7 @@ namespace PIQI_Engine.Server.Engines
                 refData.SAMList = result2;
 
                 // evaluation rubric
-                EvaluationRubric? result3 = LoadEvaluationRubric(EvaluationRubricMnemonic);
+                EvaluationRubric? result3 = LoadEvaluationRubric(EvaluationRubricMnemonic, evaluation);
                 if (result3 == null) throw new Exception($"Missing or failed to load evaluation rubric: {EvaluationRubricMnemonic}.");
                 refData.EvaluationRubric = result3;
 
@@ -81,16 +82,21 @@ namespace PIQI_Engine.Server.Engines
                 if (result5 == null) throw new Exception("Missing or failed to load value list.");
                 refData.ValueList = result5;
 
+                // Value list
+                List<ValueSet>? result6 = LoadValueSetList();
+                if (result6 == null) throw new Exception("Missing or failed to load value set list.");
+                refData.ValueSetList = result6;
+
                 // Models
                 string? evalModelMnemonic = refData.EvaluationRubric?.Model?.Mnemonic;
                 if (evalModelMnemonic == null) throw new Exception("Missing PIQI model mnemonic in evaluation rubric.");
 
-                Model? result6 = LoadModel(evalModelMnemonic);
-                if (result6 == null) throw new Exception($"Missing or failed to load model: {evalModelMnemonic}.");
-                refData.Model = result6;
+                Model? result8 = LoadModel(evalModelMnemonic);
+                if (result8 == null) throw new Exception($"Missing or failed to load model: {evalModelMnemonic}.");
+                refData.Model = result8;
 
                 // Entities
-                if (refData.Model.ModelDataClasses == null) throw new Exception($"Missing or failed to load entities from the model: {evalModelMnemonic}.");
+                if (refData.Model.DataClasses == null) throw new Exception($"Missing or failed to load entities from the model: {evalModelMnemonic}.");
                 refData.EntityModel = new EntityModel(refData.Model);
 
                 return refData;
@@ -133,6 +139,21 @@ namespace PIQI_Engine.Server.Engines
             lock (_CacheLock)
             {
                 _Cache.AddOrUpdate<T>(cacheBaseKey, item);
+            }
+        }
+
+        /// <summary>
+        /// Removes an item in the cache under the specified key.
+        /// </summary>
+        /// <param name="cacheBaseKey">The key under which the item will be stored in the cache.</param>
+        /// <remarks>
+        /// This method uses a lock on <see cref="_CacheLock"/> to ensure thread-safe cache updates.
+        /// </remarks>
+        protected void RemoveCacheItem(string cacheBaseKey)
+        {
+            lock (_CacheLock)
+            {
+                _Cache.Remove(cacheBaseKey);
             }
         }
 
@@ -254,7 +275,6 @@ namespace PIQI_Engine.Server.Engines
                 throw;
             }
         }
-
         #endregion
 
         #region Evaluation rubric
@@ -263,74 +283,94 @@ namespace PIQI_Engine.Server.Engines
         /// Loads evaluation rubric by evaluation rubric mnemonic.
         /// </summary>
         /// <returns>A <see cref="EvaluationRubric"/> with the matching evaluation rubric mnemonic.</returns>
-        private EvaluationRubric? LoadEvaluationRubric(string evaluationRubricMnemonic)
+        private EvaluationRubric? LoadEvaluationRubric(string evaluationRubricMnemonic, IFormFile? evaluation)
         {
             string baseKey = "EVALUATION_RUBRIC";
             string libraryKey = "EVALUATION_RUBRIC_LIBRARY";
 
             try
             {
-                // Get from cache
-                CacheItem<List<ReferenceDataProfile>>? libraryCacheItem = GetCacheItem<List<ReferenceDataProfile>>($"{baseKey}|{libraryKey}");
-                CacheItem<EvaluationRubric>? evaluationCacheItem = GetCacheItem<EvaluationRubric>($"{baseKey}|{evaluationRubricMnemonic}");
-                List<ReferenceDataProfile>? library = libraryCacheItem?.Value;
-                EvaluationRubric? evaluationRubric = evaluationCacheItem?.Value;
-
-                // Get file path from configuration file
-                string? libraryFilePath = _Configuration["FilePaths:EvaluationPath"];
-                string? evaluationFilePath = null;
-                if (libraryFilePath != null && File.Exists(libraryFilePath))
+                if (evaluation != null)
                 {
-                    DateTime libraryLastModified = File.GetLastWriteTimeUtc(libraryFilePath);
-                    // Create/reset list if needed
-                    if (library == null || libraryCacheItem?.LastModified < libraryLastModified)
-                        library = new List<ReferenceDataProfile>();
+                    if (evaluation.Length == 0)
+                        throw new Exception("File not selected");
 
-                    // Get the filepath from the library
-                    if (library.Any(ep => ep.Mnemonic.Equals(evaluationRubricMnemonic)))
-                        evaluationFilePath = library.FirstOrDefault(ep => ep.Mnemonic.Equals(evaluationRubricMnemonic))?.FilePath;
-                    else
+                    using (var reader = new StreamReader(evaluation.OpenReadStream()))
                     {
-                        // Read file and deserialize the JSON to get the list of profiles
-                        string profileJson = File.ReadAllText(libraryFilePath);
-                        List<ReferenceDataProfile>? evaluationProfiles = JsonConvert.DeserializeObject<ReferenceDataProfileRoot>(profileJson)?.EvaluationProfiles;
-                        if (evaluationProfiles == null) throw new Exception("Failed to load evaluation profiles.");
-
-                        // Add updated library to the cache
-                        SetCacheItem<List<ReferenceDataProfile>>(evaluationProfiles, $"{baseKey}|{libraryKey}");
-
-                        // Get the file path for the evaluation rubric
-                        evaluationFilePath = evaluationProfiles.FirstOrDefault(e => e.Mnemonic.Equals(evaluationRubricMnemonic))?.FilePath;
+                        string rubricJson = reader.ReadToEnd();
+                        EvaluationRubric? rubric = JsonConvert.DeserializeObject<EvaluationRubric>(rubricJson);
+                        if (rubric == null) throw new Exception("Failed to load evaluation rubric.");
+                        return rubric;
                     }
-
-                    if (evaluationFilePath != null && File.Exists(evaluationFilePath))
-                    {
-                        // Check if the evaluation rubric has been modified since last cached
-                        DateTime evaluationLastModified = File.GetLastWriteTimeUtc(evaluationFilePath);
-                        if (evaluationRubric == null || evaluationCacheItem?.LastModified < evaluationLastModified)
-                        {
-                            // Deserialize the file into an evaluation rubric
-                            string rubricJson = File.ReadAllText(evaluationFilePath);
-                            evaluationRubric = JsonConvert.DeserializeObject<EvaluationRubric>(rubricJson);
-                            if (evaluationRubric == null) throw new Exception("Failed to load evaluation rubric.");
-                        }
-                    }
-                    else if (evaluationRubric == null)
-                        throw new Exception("File for evaluation rubric is invalid or missing.");
-
-                    // Put the evaluation rubric in the cache
-                    SetCacheItem<EvaluationRubric>(evaluationRubric, $"{baseKey}|{evaluationRubricMnemonic}");
-                    return evaluationRubric;
                 }
                 else
-                    throw new Exception("Evaluation library not found.");
+                {
+                    // Get from cache
+                    CacheItem<List<ReferenceDataProfile>>? libraryCacheItem = GetCacheItem<List<ReferenceDataProfile>>($"{baseKey}|{libraryKey}");
+                    CacheItem<EvaluationRubric>? evaluationCacheItem = GetCacheItem<EvaluationRubric>($"{baseKey}|{evaluationRubricMnemonic}");
+                    List<ReferenceDataProfile>? library = libraryCacheItem?.Value;
+                    EvaluationRubric? evaluationRubric = evaluationCacheItem?.Value;
+
+                    // Get file path from configuration file
+                    string? libraryFilePath = _Configuration["FilePaths:EvaluationPath"];
+                    string? evaluationFilePath = null;
+                    if (libraryFilePath != null && File.Exists(libraryFilePath))
+                    {
+                        DateTime libraryLastModified = File.GetLastWriteTimeUtc(libraryFilePath);
+                        // Create/reset list if needed
+                        if (library == null || libraryCacheItem?.LastModified < libraryLastModified)
+                            library = new List<ReferenceDataProfile>();
+
+                        // Get the filepath from the library
+                        if (library.Any(ep => ep.Mnemonic.Equals(evaluationRubricMnemonic)))
+                            evaluationFilePath = library.FirstOrDefault(ep => ep.Mnemonic.Equals(evaluationRubricMnemonic))?.FilePath;
+                        else
+                        {
+                            // Read file and deserialize the JSON to get the list of profiles
+                            string profileJson = File.ReadAllText(libraryFilePath);
+                            library = JsonConvert.DeserializeObject<ReferenceDataProfileRoot>(profileJson)?.EvaluationProfiles;
+                            if (library == null) throw new Exception("Failed to load evaluation profiles.");
+
+                            // Add updated library to the cache
+                            SetCacheItem<List<ReferenceDataProfile>>(library, $"{baseKey}|{libraryKey}");
+
+                            // Get the file path for the evaluation rubric
+                            evaluationFilePath = library.FirstOrDefault(e => e.Mnemonic.Equals(evaluationRubricMnemonic))?.FilePath;
+                        }
+
+                        if (evaluationFilePath != null && File.Exists(evaluationFilePath))
+                        {
+                            // Check if the evaluation rubric has been modified since last cached
+                            DateTime evaluationLastModified = File.GetLastWriteTimeUtc(evaluationFilePath);
+                            if (evaluationRubric == null || evaluationCacheItem?.LastModified < evaluationLastModified)
+                            {
+                                // Deserialize the file into an evaluation rubric
+                                string rubricJson = File.ReadAllText(evaluationFilePath);
+                                evaluationRubric = JsonConvert.DeserializeObject<EvaluationRubric>(rubricJson);
+                                if (evaluationRubric == null) throw new Exception("Failed to load evaluation rubric.");
+                            }
+                        }
+                        else if (evaluationRubric == null) 
+                            throw new Exception("File for evaluation rubric is invalid or missing.");
+
+                        // Update name to match profile name
+                        if (library?.FirstOrDefault(ep => ep.Mnemonic.Equals(evaluationRubricMnemonic))?.Name != null)
+                            evaluationRubric.Name = library?.FirstOrDefault(ep => ep.Mnemonic.Equals(evaluationRubricMnemonic))?.Name;
+
+                        // Put the evaluation rubric in the cache
+                        SetCacheItem<EvaluationRubric>(evaluationRubric, $"{baseKey}|{evaluationRubricMnemonic}");
+                        return evaluationRubric;
+                    }
+                    else
+                        throw new Exception("Evaluation library not found.");
+                }
             }
             catch
             {
                 throw;
             }
         }
-
+        
         #endregion
 
         #region SAMs
@@ -466,11 +506,58 @@ namespace PIQI_Engine.Server.Engines
 
                 return valueList;
             }
-            catch 
+            catch
             {
                 throw;
             }
         }
         #endregion
+
+        #region ValueSetList
+        /// <summary>
+        /// Loads a list of all supported value set lists.
+        /// </summary>
+        /// <returns>A list of<see cref = "ValueSet" /> supported.</returns>
+        private List<ValueSet>? LoadValueSetList()
+        {
+            string baseKey = "VALUE_SET_LIST";
+
+            try
+            {
+                // Get from cache
+                CacheItem<List<ValueSet>>? cacheItem = GetCacheItem<List<ValueSet>>(baseKey);
+                List<ValueSet>? valueList = cacheItem?.Value;
+
+                // Get file path from configuration file
+                string? filePath = _Configuration["FilePaths:ValueSetListPath"];
+                if (filePath != null && File.Exists(filePath))
+                {
+                    DateTime lastModified = File.GetLastWriteTimeUtc(filePath);
+                    // Check if the code system is cached/if the cache needs to be updated
+                    if (valueList == null || cacheItem?.LastModified < lastModified)
+                    {
+                        // Get failed. Load manually.
+                        valueList = new List<ValueSet>();
+
+                        // Read file and deserialize the JSON
+                        string json = File.ReadAllText(filePath);
+
+                        valueList = JsonConvert.DeserializeObject<ValueSetListRoot>(json)?.ValueSetLibrary;
+                        if (valueList == null) throw new Exception("Failed to load value set list");
+
+                        // Put value list in cache
+                        SetCacheItem<List<ValueSet>>(valueList, baseKey);
+                    }
+                }
+
+                return valueList;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        #endregion
+
     }
 }

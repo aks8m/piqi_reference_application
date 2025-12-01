@@ -299,7 +299,7 @@ namespace PIQI_Engine.Server.Services
         public static JObject JSON_AddRefRangeObject(ReferenceRange range)
         {
             JObject rr = new JObject();
-            rr.Add("text", range.Text);
+            rr.Add("text", range.Text ?? "");
             rr.Add("lowValue", range.LowValue);
             rr.Add("highValue", range.HighValue);
 

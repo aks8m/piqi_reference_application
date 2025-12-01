@@ -34,7 +34,6 @@ public partial class Program
         builder.Services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc(openApi.Version, openApi);
-
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
         });
 
@@ -56,7 +55,7 @@ public partial class Program
         // Client for API SAMs, etc.
         builder.Services.AddHttpClient();
 
-        builder.Services.AddScoped<SAMReferenceDataService>();
+        builder.Services.AddScoped<SAMService>();
 
         var app = builder.Build();
 
@@ -64,17 +63,23 @@ public partial class Program
         var logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext().CreateLogger();
         loggerFactory.AddSerilog(logger);
 
+        app.UseHttpsRedirection();
+        app.UseRouting();
+
+        app.UseCors("AllowAll");
+
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
         app.UseSwagger();
-        app.UseSwaggerUI();
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
-
-        app.UseCors("AllowAll");
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint(builder.Configuration["CustomSwaggerUI:SwaggerEndpoint"], openApi.Version);
+            options.InjectStylesheet(builder.Configuration["CustomSwaggerUI:CSSPath"]);
+            options.InjectJavascript(builder.Configuration["CustomSwaggerUI:JSPath"], "text/javascript");
+            options.DocumentTitle = builder.Configuration["CustomSwaggerUI:DocTitle"];
+            options.DefaultModelsExpandDepth(-1);
+        });
 
         app.MapControllers();
 

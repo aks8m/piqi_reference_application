@@ -12,17 +12,16 @@ namespace PIQI_Engine.Server.Models
         /// The name of the parameter.
         /// </summary>
         public string Name { get; set; } = null!;
+        public string Mnemonic { get; set; } = null!;
 
         /// <summary>
-        /// The type ID of the parameter.
+        /// The value type of the parameter.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public SAMParameterTypeEnum ParameterType { get; set; }
+        public string ParameterValueTypeName { get; set; }
 
         /// <summary>
-        /// The data type ID of the parameter.
+        /// Whether or not the sam parameter is optional
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public EntityDataTypeEnum DataType { get; set; }
+        public bool IsOptional { get; set; }
     }
 }

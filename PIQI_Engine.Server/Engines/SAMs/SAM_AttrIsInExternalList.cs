@@ -12,10 +12,10 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// Initializes a new instance of the <see cref="SAM_AttrIsInExternalList"/> class.
         /// </summary>
         /// <param name="sam">The SAM object associated with this evaluator.</param>
-        /// /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to access reference data and make FHIR API calls.
+        /// /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public SAM_AttrIsInExternalList(SAM sam, SAMReferenceDataService referenceDataService) : base(sam, referenceDataService) { }
+        public SAM_AttrIsInExternalList(SAM sam, SAMService samService) : base(sam, samService) { }
 
         /// <summary>
         /// Evaluates whether the text value of a message attribute exists in a specified external value list.
@@ -36,7 +36,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// The method performs the following checks:
         /// <list type="bullet">
         /// <item><description>Validates that the parameter list contains the "Code System List" entry.</description></item>
-        /// <item><description>Ensures the <see cref="_SAMReferenceDataService.ReferenceData"/> and its <c>ValueList</c> are available.</description></item>
+        /// <item><description>Ensures the <see cref="_SAMService.ReferenceData"/> and its <c>ValueList</c> are available.</description></item>
         /// <item><description>Verifies that the specified value list mnemonic exists in the reference data.</description></item>
         /// <item><description>Performs a case-insensitive comparison of the attribute's text against both <c>DataCode</c> and <c>DataText</c> entries in the value list.</description></item>
         /// </list>
@@ -59,31 +59,60 @@ namespace PIQI_Engine.Server.Engines.SAMs
                 // Set the message model item
                 MessageModelItem item = (MessageModelItem)request.MessageObject;
 
-                // Access the attribute's message data
-                BaseText data = (BaseText)item.MessageData;
+                List<string> valueTextList = new List<string>();
+                if (item.MessageData is CodeableConcept)
+                {
+                    // Get all codes from complete codings
+                    CodeableConcept concept = (CodeableConcept)item.MessageData;
+                    if (concept.HasCodedItems)
+                    {
+                        foreach (Coding coding in concept.CodingList.Where(t => t.IsComplete))
+                            valueTextList.Add(coding.CodeValue);
+                    }
+
+                    // Fail condition: no data
+                    if (valueTextList.Count < 1) return result.Fail("Attribute contained no complete codings");
+                }
+                else
+                {
+                    // Get the text value
+                    BaseText data = (BaseText)item.MessageData;
+                    if (!string.IsNullOrEmpty(data.Text))
+                        valueTextList.Add(data.Text);
+
+                    // Fail condition: no data
+                    if (valueTextList.Count < 1) return result.Fail("Attribute was unpopulated");
+                }
 
                 // Get the ValueListMnemonic parameter
                 if (request.ParmList == null) throw new Exception("Parameter list was not supplied");
-                Tuple<string, string> arg1 = request.ParmList.Where(t => t.Item1 == "Code System List").FirstOrDefault();
-                if (arg1 == null) throw new Exception("[Code System List] parameter not found");
+                Tuple<string, string> arg1 = request.ParmList.Where(t => t.Item1 == "EXTERNAL_LIST_MNEMONIC").FirstOrDefault();
+                if (arg1 == null) throw new Exception("[External List Mnemonic] parameter not found");
                 string setMnemonic = arg1.Item2;
 
-                // Verify _SAMReferenceDataService.ReferenceData is not null
-                if (_SAMReferenceDataService.ReferenceData == null || _SAMReferenceDataService.ReferenceData.ValueList == null) throw new Exception("Missing or invalid reference data for SAM_AttrIsInExternalList");
+                // Verify _SAMService.ReferenceData is not null
+                if (_SAMService.Message.RefData == null || _SAMService?.Message?.RefData?.ValueList == null) throw new Exception("Missing or invalid reference data for SAM_AttrIsInExternalList");
 
                 // Verify that the value list exists in the reference data
-                if (!_SAMReferenceDataService.ReferenceData.ValueList.Any(v => v.Mnemonic == setMnemonic))
+                if (!_SAMService.Message.RefData.ValueList.Any(v => v.Mnemonic == setMnemonic))
                     throw new Exception("Value data [" + setMnemonic + "] not in RefData. Check processing engine.");
 
                 // Retrieve the value list (case-insensitive match)
-                ValueList value = _SAMReferenceDataService.ReferenceData.ValueList
+                ValueList value = _SAMService.Message.RefData.ValueList
                     .FirstOrDefault(v => v.Mnemonic.Equals(setMnemonic, StringComparison.OrdinalIgnoreCase));
 
-                // Check if the attribute's text exists in the code list or text entries
-                passed = value.CodeList.Any(c =>
-                    c.DataCode.Equals(data.Text, StringComparison.OrdinalIgnoreCase) ||
-                    c.DataText.Equals(data.Text, StringComparison.OrdinalIgnoreCase)
-                );
+                foreach (string valueText in valueTextList)
+                {
+                    if (value.CodeList.Any(c =>
+                            c.DataCode.Equals(valueText, StringComparison.OrdinalIgnoreCase) ||
+                            c.DataText.Equals(valueText, StringComparison.OrdinalIgnoreCase)
+                        )
+                    )
+                    {
+                        passed = true;
+                        break;
+                    }
+                }
 
                 // Update result
                 result.Done(passed);

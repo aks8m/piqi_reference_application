@@ -9,7 +9,7 @@
         /// <summary>
         /// The collection of data types in this library.
         /// </summary>
-        public List<DataType> DataTypeLibrary { get; set; }
+        public List<DataType> DataTypeLibrary { get; set; } = new List<DataType>();
     }
 
     /// <summary>

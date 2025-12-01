@@ -52,16 +52,15 @@
             try
             {
                 // Find root entity (entity with no parent)
-                Root = new Entity(model.RootEntityFieldName, model.RootEntityName, model.RootEntityMnemonic);
+                Root = new Entity(model.RootEntityName, model.RootEntityMnemonic);
                 if (Root == null) return;
 
                 EntityList = new List<Entity>();
 
                 // Build hierarchy starting from root
-                foreach (Entity classEntity in model.ModelDataClasses)
+                foreach (Entity classEntity in model.DataClasses)
                 {
-                    if (classEntity != null)
-                        ProcessEntity(classEntity, Root);
+                    ProcessEntity(classEntity, Root);
                 }
             }
             catch
@@ -86,11 +85,11 @@
 
                 if (parentEntity?.Children != null)
                 {
-                    foreach (Entity entity in parentEntity.Children.OrderBy(e => e.DataTypeID))
+                    foreach (Entity entity in parentEntity.Children.OrderBy(e => e.EntityType.EntityTypeValue))
                     {
-                        if (entity.DataTypeID == EntityDataTypeEnum.CLS)
+                        if (entity.EntityType.EntityTypeValue == EntityDataTypeEnum.CLS)
                         {
-                            classEntity = new Entity(entity, parentEntity.CardinalityID);
+                            classEntity = new Entity(entity, parentEntity.Cardinality?.CardinalityValue);
                             if (root != null)
                             {
                                 if (root.Children == null) root.Children = new List<Entity>();
@@ -98,7 +97,7 @@
                             }
                             EntityList.Add(classEntity);
                         }
-                        else if (entity.DataTypeID == EntityDataTypeEnum.ELM)
+                        else if (entity.EntityType.EntityTypeValue == EntityDataTypeEnum.ELM)
                         {
                             elementEntity = new Entity(entity, null);
                             if (classEntity != null)
@@ -108,7 +107,7 @@
                             }
                             EntityList.Add(elementEntity);
                         }
-                        else if (entity.DataTypeID > EntityDataTypeEnum.ELM)
+                        else if (entity.EntityType.EntityTypeValue > EntityDataTypeEnum.ELM)
                         {
                             if (elementEntity != null)
                             {

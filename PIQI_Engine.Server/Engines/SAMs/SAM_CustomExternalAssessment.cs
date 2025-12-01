@@ -14,10 +14,10 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// Initializes a new instance of the <see cref="SAM_CustomExternalAssessment"/> class.
         /// </summary>
         /// <param name="sam">The SAM object associated with this evaluator.</param>
-        /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to access reference data and make FHIR API calls.
+        /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public SAM_CustomExternalAssessment(SAM sam, SAMReferenceDataService referenceDataService) : base(sam, referenceDataService) { }
+        public SAM_CustomExternalAssessment(SAM sam, SAMService samService) : base(sam, samService) { }
 
         /// <summary>
         /// Evaluates a PIQI message asynchronously using a RESTful API call.
@@ -66,7 +66,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
                 if (content == null || processingUrl == null) throw new Exception("Invalid process url or request in SAM_CustomExternalAssessment.");
 
                 // Call the API
-                var apiResponse = await _SAMReferenceDataService.Client.PostAsync(processingUrl, content);
+                var apiResponse = await _SAMService.Client.PostAsync(processingUrl, content);
                 if (apiResponse == null) throw new Exception($"Failed to call SAM API: {processingUrl}");
 
                 // Parse the response

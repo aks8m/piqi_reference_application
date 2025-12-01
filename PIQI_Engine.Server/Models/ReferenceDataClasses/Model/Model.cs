@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace PIQI_Engine.Server.Models
+﻿namespace PIQI_Engine.Server.Models
 {
     /// <summary>
     /// Represents an individual PIQI model with metadata and possible sub-models.
@@ -28,10 +26,9 @@ namespace PIQI_Engine.Server.Models
         public string? Description { get; set; }
 
         /// <summary>
-        /// Enum describing the type of model.
+        /// The type of the model.
         /// </summary>
-        [JsonProperty(PropertyName = "modelTypeId")]
-        public ModelTypeEnum ModelType { get; set; }
+        public string ModelTypeName { get; set; }
 
         /// <summary>
         /// The mnemonic of the root entity associated with this model.
@@ -44,14 +41,9 @@ namespace PIQI_Engine.Server.Models
         public string RootEntityName { get; set; } = null!;
 
         /// <summary>
-        /// The field name of the root entity associated with this model.
+        /// Optional PIQI base model if this model extends another model.
         /// </summary>
-        public string RootEntityFieldName { get; set; } = null!;
-
-        /// <summary>
-        /// Optional mnemonic of a base model if this model extends another model.
-        /// </summary>
-        public string? BaseModelMnemonic { get; set; }
+        public PIQIModel? BaseModel { get; set; }
 
         /// <summary>
         /// Last date the model was published.
@@ -66,6 +58,6 @@ namespace PIQI_Engine.Server.Models
         /// <summary>
         /// A list of class entities under this model.
         /// </summary>
-        public List<Entity> ModelDataClasses { get; set; } = new List<Entity>();
+        public List<Entity> DataClasses { get; set; } = new List<Entity>();
     }
 }

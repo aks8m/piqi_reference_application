@@ -61,14 +61,9 @@ namespace PIQI_Engine.Server.Models
         public string? ExecutionReference { get; set; }
 
         /// <summary>
-        /// Optional alias representing a successful outcome.
-        /// </summary>
-        public string? SuccessAlias { get; set; }
-
-        /// <summary>
         /// Optional alias representing a failure outcome.
         /// </summary>
-        public string? FailureAlias { get; set; }
+        public string? FailName { get; set; }
 
         /// <summary>
         /// Optional input type for the SAM.

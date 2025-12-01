@@ -8,16 +8,16 @@
         /// <summary>
         /// Exactly one instance is required.
         /// </summary>
-        One = 1,
+        ONE = 1,
 
         /// <summary>
         /// Zero or more instances are allowed.
         /// </summary>
-        ZeroToMany = 2,
+        ZERO_TO_MANY = 2,
 
         /// <summary>
         /// One or more instances are required.
         /// </summary>
-        OneToMany = 3
+        ONE_TO_MANY = 3
     }
 }

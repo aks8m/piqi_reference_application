@@ -45,6 +45,22 @@
         /// </summary>
         public bool Errored { get { return ResultState == SAMResultStateEnum.ERRORED; } }
 
+        /// <summary>
+        /// Gets or sets the reason why the SAM evaluation was skipped.
+        /// </summary>
+        /// <remarks>
+        /// This property is only populated when <see cref="ResultState"/> is <see cref="SAMResultStateEnum.SKIPPED"/>.
+        /// </remarks>
+        public string? SkipReason { get; set; }
+
+        /// <summary>
+        /// Gets or sets the reason why the SAM evaluation failed.
+        /// </summary>
+        /// <remarks>
+        /// This property is only populated when <see cref="ResultState"/> is <see cref="SAMResultStateEnum.FAILED"/>.
+        /// </remarks>
+        public string? FailReason { get; set; }
+
         #endregion
 
         #region Methods
@@ -60,17 +76,35 @@
         /// <summary>
         /// Marks the SAM evaluation as failed.
         /// </summary>
-        public void Fail()
+        /// <param name="failReason">
+        /// An optional message describing the reason for failure. 
+        /// This value is stored in the <see cref="FailReason"/> property.
+        /// </param>
+        /// <returns>
+        /// The current <see cref="PIQISAMResponse"/> instance, allowing for method chaining.
+        /// </returns>
+        public PIQISAMResponse Fail(string? failReason = null)
         {
             ResultState = SAMResultStateEnum.FAILED;
+            FailReason = failReason;
+            return this;
         }
 
         /// <summary>
         /// Marks the SAM evaluation as skipped.
         /// </summary>
-        public void Skip()
+        /// <param name="skipReason">
+        /// An optional message describing the reason for skipping the evaluation. 
+        /// This value is stored in the <see cref="SkipReason"/> property.
+        /// </param>
+        /// <returns>
+        /// The current <see cref="PIQISAMResponse"/> instance, allowing for method chaining.
+        /// </returns>
+        public PIQISAMResponse Skip(string? skipReason = null)
         {
             ResultState = SAMResultStateEnum.SKIPPED;
+            SkipReason = skipReason;
+            return this;
         }
 
         /// <summary>

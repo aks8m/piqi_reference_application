@@ -1,10 +1,11 @@
-﻿using System.Text.RegularExpressions;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.Text.RegularExpressions;
 
 namespace PIQI_Engine.Server.Models
 {
     /// <summary>
     /// Represents the full PIQI statistical result returned from the engine after evaluation.
-    /// Includes message-level score, class-level scores, informational evaluations, and detection results.
+    /// Includes message-level score, class-level scores, and informational evaluation results.
     /// </summary>
     public class PIQIStatResponse
     {
@@ -49,10 +50,6 @@ namespace PIQI_Engine.Server.Models
         /// </summary>
         public List<InformationalResult> InformationalResults { get; set; }
 
-        /// <summary>
-        /// Detection results.
-        /// </summary>
-        public List<DetectionResult> DetectionResults { get; set; }
         #endregion
 
         #region Constructors
@@ -63,11 +60,11 @@ namespace PIQI_Engine.Server.Models
         public PIQIStatResponse() { }
 
         /// <summary>
-        /// Initializes a new PIQIStatResponse based on a StatMethodResult and the associated PIQI message.
+        /// Initializes a new PIQIStatResponse based on a StatResponse and the associated PIQI message.
         /// </summary>
-        /// <param name="statMethodResult">The statistical result object.</param>
+        /// <param name="statResponse">The statistical result object.</param>
         /// <param name="message">The original PIQI message being evaluated.</param>
-        public PIQIStatResponse(StatMethodResult statMethodResult, PIQIMessage message)
+        public PIQIStatResponse(StatResponse statResponse, PIQIMessage message)
         {
             // Headers
             DataProviderID = message.MessageModel.Header.ProviderName;
@@ -76,32 +73,25 @@ namespace PIQI_Engine.Server.Models
             EvaluationRubric = message.RefData.EvaluationRubric.Name ?? message.RefData.EvaluationRubric.Mnemonic;
 
             // Message score
-            MessageResults = new ScoreResult(statMethodResult);
+            MessageResults = new ScoreResult(statResponse);
 
             // Create Lists
             DataClassResults = new List<DataClassScoreResult>();
             InformationalResults = new List<InformationalResult>();
-            DetectionResults = new List<DetectionResult>();
 
-            // Iterate through classes and add results
-            foreach (var statClass in statMethodResult.ClassDict)
+            // Class scores and information results
+            foreach (EvaluationItem evaluationItem in message.EvaluationManager?.EvaluationItemDict?.Values?.Where(er => er.ItemType == EntityItemTypeEnum.Class) ?? [])
             {
-                MessageModelItem dataClass = message.MessageModel.ClassDict.FirstOrDefault(dc => dc.Value.ClassEntity?.Mnemonic == statClass.Value?.EntityTypeMnemonic).Value;
+                StatResponseClass? statClass = statResponse.ClassDict?.Values?.FirstOrDefault(c => c.ClassMnemonic == evaluationItem.ClassEntityMnemonic);
+                DataClassScoreResult dataClassStatResult = new DataClassScoreResult(statClass, evaluationItem.Entity.FieldName ?? evaluationItem.Entity.Name);
+                DataClassResults.Add(dataClassStatResult);
 
-                if (dataClass.Entity != null && statClass.Value != null)
-                {
-                    DataClassScoreResult dataClassStatResult = new DataClassScoreResult(statClass.Value, dataClass.ClassEntity.FieldName ?? dataClass.ClassEntity.Name);
-                    DataClassResults.Add(dataClassStatResult);
-
-                    if (statMethodResult.InformationalDict.Any(i => i.Value.EntityTypeMnemonic == dataClass.ClassEntity.Mnemonic))
-                    {
-                        InformationalResult informationalResult = new InformationalResult(statMethodResult, dataClass.Entity);
-                        InformationalResults.Add(informationalResult);
-                    }
-                }
+                InformationalResult informationalResult = new InformationalResult(statResponse, evaluationItem.Entity);
+                InformationalResults.Add(informationalResult);
             }
 
             DataClassResults = DataClassResults.OrderBy(d => d.DataClassName).ToList();
+
         }
         #endregion
     }
@@ -132,26 +122,27 @@ namespace PIQI_Engine.Server.Models
         /// <summary>
         /// Initializes a new DataClassScoreResult.
         /// </summary>
-        /// <param name="statMethodResultClass">The statistical class result.</param>
+        /// <param name="statResponseClass">The statistical class result.</param>
         /// <param name="dataClassName">The name of the data class.</param>
-        public DataClassScoreResult(StatMethodResultClass statMethodResultClass, string dataClassName)
+        public DataClassScoreResult(StatResponseClass statResponseClass, string dataClassName)
         {
-            DataClassName = dataClassName;
-            InstanceCount = statMethodResultClass.ElementCount;
+            var dataClassNameSpaced = string.IsNullOrEmpty(dataClassName)? dataClassName : Regex.Replace(dataClassName, "([A-Z])", " $1").Trim();
+            DataClassName = char.ToUpper(dataClassNameSpaced[0]) + dataClassNameSpaced.Substring(1);
+            InstanceCount = statResponseClass.ElementCount;
 
             // Unweighted score
-            Denominator = statMethodResultClass.SAMScoringProcessedCount;
-            Numerator = statMethodResultClass.SAMPassCount;
+            Denominator = statResponseClass.SAMScoringProcessedCount;
+            Numerator = statResponseClass.SAMPassCount;
             if (Denominator != 0)
                 PIQIScore = (int)Math.Truncate((float)Numerator / (float)Denominator * 100);
 
             // Weighted score
-            WeightedDenominator = statMethodResultClass.SAMWeightedDenominator;
-            WeightedNumerator = statMethodResultClass.SAMWeightedNumerator;
+            WeightedDenominator = statResponseClass.SAMWeightedDenominator;
+            WeightedNumerator = statResponseClass.SAMWeightedNumerator;
             if (WeightedDenominator != 0)
                 WeightedPIQIScore = (int)Math.Truncate((float)WeightedNumerator / (float)WeightedDenominator * 100);
 
-            CriticalFailureCount = statMethodResultClass.CriticalFailureCount;
+            CriticalFailureCount = statResponseClass.CriticalFailureCount;
         }
         #endregion
     }
@@ -209,25 +200,24 @@ namespace PIQI_Engine.Server.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ScoreResult"/> class using the specified statistical method results.
         /// </summary>
-        /// <param name="statMethodResult">The statistical method results used to populate the score values.</param>
-        public ScoreResult(StatMethodResult statMethodResult)
+        /// <param name="statResponse">The statistical method results used to populate the score values.</param>
+        public ScoreResult(StatResponse statResponse)
         {
-            Denominator = statMethodResult.ScoringProcCount;
-            Numerator = statMethodResult.ScoringPassCount;
+            Denominator = statResponse.ScoringProcCount;
+            Numerator = statResponse.ScoringPassCount;
             if (Denominator != 0)
                 PIQIScore = (int)Math.Truncate((float)Numerator / (float)Denominator * 100);
 
-            WeightedDenominator = statMethodResult.WeightedProcCount;
-            WeightedNumerator = statMethodResult.WeightedPassCount;
+            WeightedDenominator = statResponse.WeightedProcCount;
+            WeightedNumerator = statResponse.WeightedPassCount;
             if (WeightedDenominator != 0)
                 WeightedPIQIScore = (int)Math.Truncate((float)WeightedNumerator / (float)WeightedDenominator * 100);
 
-            CriticalFailureCount = statMethodResult.CriticalFailureCount;
+            CriticalFailureCount = statResponse.CriticalFailureCount;
         }
 
         #endregion
     }
-
 
     /// <summary>
     /// Represents the informational (non-scoring) results for a data class.
@@ -258,20 +248,23 @@ namespace PIQI_Engine.Server.Models
         /// Initializes a new instance of the <see cref="InformationalResult"/> class
         /// using the specified statistical method results and data class.
         /// </summary>
-        /// <param name="statMethodResult">
+        /// <param name="statResponse">
         /// The statistical method results containing informational entries to evaluate.
         /// </param>
         /// <param name="dataClass">
         /// The data class for which the informational results are being created.
         /// </param>
-        public InformationalResult(StatMethodResult statMethodResult, Entity dataClass)
+        public InformationalResult(StatResponse statResponse, Entity dataClass)
         {
-            DataClassName = dataClass.FieldName ?? dataClass.Name;
+            var dataClassNameSpaced = string.IsNullOrEmpty(dataClass.FieldName) ?
+                (string.IsNullOrEmpty(dataClass.Name) ? dataClass.Name : Regex.Replace(dataClass.FieldName, "([A-Z])", " $1").Trim()) :
+                Regex.Replace(dataClass.FieldName, "([A-Z])", " $1").Trim();
+            DataClassName = char.ToUpper(dataClassNameSpaced[0]) + dataClassNameSpaced.Substring(1);
             EvaluationList = new List<InformationalEvaluation>();
 
-            Dictionary<string, StatMethodResultInformational> classInformationalList =
-                statMethodResult.InformationalDict
-                    .Where(i => i.Value.EntityTypeMnemonic == dataClass.Mnemonic)
+            Dictionary<string, StatResponseInformational> classInformationalList =
+                statResponse.InformationalDict
+                    .Where(i => i.Value.ClassMnemonic == dataClass.Mnemonic)
                     .OrderBy(i => i.Value.EntityName)
                     .ToDictionary(i => i.Key, i => i.Value);
 
@@ -284,7 +277,6 @@ namespace PIQI_Engine.Server.Models
 
         #endregion
     }
-
 
     /// <summary>
     /// Represents a single informational evaluation for a specific SAM (Statistical Analysis Method).
@@ -331,10 +323,10 @@ namespace PIQI_Engine.Server.Models
         /// using the specified informational result values.
         /// </summary>
         /// <param name="informational">
-        /// The <see cref="StatMethodResultInformational"/> object containing details
+        /// The <see cref="StatResponseInformational"/> object containing details
         /// about the SAM evaluation to populate this instance.
         /// </param>
-        public InformationalEvaluation(StatMethodResultInformational informational)
+        public InformationalEvaluation(StatResponseInformational informational)
         {
             EvaluationName = informational.SAMName;
             EntityName = informational.EntityName;
@@ -342,49 +334,6 @@ namespace PIQI_Engine.Server.Models
             Numerator = informational.SAMPassedCount;
             Denominator = informational.SAMProcessedCount;
         }
-
-        #endregion
-    }
-
-
-    /// <summary>
-    /// Represents a set of detection results, which groups together
-    /// multiple detection evaluations under a common detection set.
-    /// </summary>
-    public class DetectionResult
-    {
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the name of the detection set that these evaluations belong to.
-        /// </summary>
-        public string DetectionSet { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of detection evaluations associated with this detection set.
-        /// </summary>
-        public List<DetectionEvaluation> Evaluations { get; set; }
-
-        #endregion
-    }
-
-    /// <summary>
-    /// Represents a single evaluation entry within a <see cref="DetectionResult"/>.
-    /// </summary>
-    public class DetectionEvaluation
-    {
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the name of the evaluation (e.g., rule or detection criteria).
-        /// </summary>
-        public string EvaluationName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the numeric detection outcome for the evaluation.
-        /// This value typically represents a count or flag indicating whether the detection was triggered.
-        /// </summary>
-        public int Detection { get; set; }
 
         #endregion
     }

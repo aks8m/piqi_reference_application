@@ -32,11 +32,6 @@
         public EntityModel EntityModel { get; set; }
 
         /// <summary>
-        /// List of entity types (data classes).
-        /// </summary>
-        public List<DataClass> EntityTypeList { get; set; }
-
-        /// <summary>
         /// The evaluation rubric used for scoring.
         /// </summary>
         public EvaluationRubric EvaluationRubric { get; set; }
@@ -55,6 +50,12 @@
         /// List of value lists used for codeable data.
         /// </summary>
         public List<ValueList> ValueList { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of individual value sets available.
+        /// </summary>
+        public List<ValueSet> ValueSetList { get; set; }
+
         #endregion
 
         #region Constructors
@@ -83,10 +84,10 @@
         {
             CodeSystemList = new List<CodeSystem>();
             SAMList = new List<SAM>();
-            EntityTypeList = new List<DataClass>();
             CriteriaList = new List<EvaluationCriterion>();
             DataTypeList = new List<DataType>();
             ValueList = new List<ValueList>();
+            ValueSetList = new List<ValueSet>();
         }
         #endregion
 
@@ -137,6 +138,8 @@
         public Entity? GetEntityClass(string mnemonic)
         {
             if (EntityModel.Root.Children == null) return null;
+            var dataClass = EntityModel.Root.Children?.FirstOrDefault(c => c.Mnemonic.Equals(mnemonic));
+            if (dataClass != null) return dataClass;
             foreach (var classEntity in EntityModel.Root.Children)
             {
                 var elementEntity = classEntity.Children?.FirstOrDefault();
@@ -169,6 +172,16 @@
         public ValueList GetValueList(string mnemonic)
         {
             return ValueList.FirstOrDefault(v => v.Mnemonic?.Equals(mnemonic) == true);
+        }
+
+        /// <summary>
+        /// Gets a value set by its mnemonic.
+        /// </summary>
+        /// <param name="mnemonic">The value set mnemonic.</param>
+        /// <returns>The <see cref="ValueSet"/> if found; otherwise, null.</returns>
+        public ValueSet GetValueSet(string mnemonic)
+        {
+            return ValueSetList.FirstOrDefault(v => v.Mnemonic?.Equals(mnemonic) == true);
         }
         #endregion
     }

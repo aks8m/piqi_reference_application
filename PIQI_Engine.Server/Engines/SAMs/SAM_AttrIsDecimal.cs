@@ -12,10 +12,10 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// Initializes a new instance of the <see cref="SAM_AttrIsDecimal"/> class.
         /// </summary>
         /// <param name="sam">The SAM object associated with this evaluator.</param>
-        /// /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to access reference data and make FHIR API calls.
+        /// /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public SAM_AttrIsDecimal(SAM sam, SAMReferenceDataService referenceDataService) : base(sam, referenceDataService) { }
+        public SAM_AttrIsDecimal(SAM sam, SAMService samService) : base(sam, samService) { }
 
         /// <summary>
         /// Evaluates whether the text value of a message attribute can be parsed as a <see cref="decimal"/>.

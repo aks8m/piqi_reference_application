@@ -12,11 +12,11 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// Initializes a new instance of the <see cref="SAM_ConceptIsConsistent"/> class.
         /// </summary>
         /// <param name="sam">The SAM object associated with this evaluator.</param>
-        /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to access reference data and make FHIR API calls.
+        /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public SAM_ConceptIsConsistent(SAM sam, SAMReferenceDataService referenceDataService)
-            : base(sam, referenceDataService) { }
+        public SAM_ConceptIsConsistent(SAM sam, SAMService samService)
+            : base(sam, samService) { }
 
         /// <summary>
         /// Evaluates whether the specified <see cref="MessageModelItem"/>'s <see cref="CodeableConcept"/> 
@@ -61,7 +61,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
 
                 // Populate reference display list via FHIR $lookup if not already done
                 if (!codeableConcept.FHIRServerCalled)
-                    await _SAMReferenceDataService.CallFHIRServer(codeableConcept);
+                    await _SAMService.LookupCodeAsync(codeableConcept);
 
                 // Get threshold
                 int threshold = 50;

@@ -12,11 +12,11 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// Initializes a new instance of the <see cref="SAM_ConceptHasDisplay"/> class.
         /// </summary>
         /// <param name="sam">The SAM object associated with this evaluator.</param>
-        /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to access reference data and make FHIR API calls.
+        /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public SAM_ConceptHasDisplay(SAM sam, SAMReferenceDataService referenceDataService)
-            : base(sam, referenceDataService) { }
+        public SAM_ConceptHasDisplay(SAM sam, SAMService samService)
+            : base(sam, samService) { }
 
         /// <summary>
         /// Evaluates whether the specified <see cref="MessageModelItem"/>'s <see cref="CodeableConcept"/> contains
@@ -60,7 +60,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
                 CodeableConcept codeableConcept = (CodeableConcept)data;
 
                 // Evaluate success if any coding has a display value
-                passed = codeableConcept.CodingList.Any(t => t.HasCodeText);
+                passed = codeableConcept.ConceptState == CodeableConceptStateEnum.Both || codeableConcept.CodingList.Any(t => t.HasCodeText);
 
                 // Update result
                 result.Done(passed);

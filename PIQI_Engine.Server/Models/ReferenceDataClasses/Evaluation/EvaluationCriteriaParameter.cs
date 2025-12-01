@@ -9,15 +9,18 @@ namespace PIQI_Engine.Server.Models
     public class EvaluationCriteriaParameter
     {
         /// <summary>
+        /// The mnemonic of the parameter.
+        /// </summary>
+        public string SamParameterMnemonic { get; set; }
+        /// <summary>
         /// The value of the parameter. Can be null.
         /// </summary>
         public string? ParameterValue { get; set; }
 
         /// <summary>
-        /// The ID representing the type of the parameter.
+        /// The name of the parameter.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public SAMParameterTypeEnum ParameterType { get; set; }
+        public string ParameterValueTypeName { get; set; } = null!;
 
         /// <summary>
         /// The name of the parameter.

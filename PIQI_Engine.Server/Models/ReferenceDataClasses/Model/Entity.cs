@@ -3,23 +3,11 @@
 namespace PIQI_Engine.Server.Models
 {
     /// <summary>
-    /// Root container for all entities.
-    /// </summary>
-    public class EntityRoot
-    {
-        /// <summary>
-        /// Collection of all entities in the system.
-        /// </summary>
-        public List<Entity> EntityLibrary { get; set; } = new List<Entity>();
-    }
-
-    /// <summary>
     /// Represents a metadata entity in the system.
     /// </summary>
     public class Entity
     {
         #region Properties
-
         /// <summary>
         /// Human-readable name of the entity.
         /// </summary>
@@ -48,19 +36,24 @@ namespace PIQI_Engine.Server.Models
         /// <summary>
         /// Data type ID for this entity.
         /// </summary>
-        [JsonProperty(PropertyName = "attributeTypeId")]
-        public EntityDataTypeEnum? DataTypeID { get; set; }
+        [JsonProperty(PropertyName = "attributeType")]
+        public EntityType? EntityType { get; set; }
 
         /// <summary>
         /// Cardinality ID for this entity.
         /// </summary>
-        public CardinalityEnum? CardinalityID { get; set; }
+        public Cardinality? Cardinality { get; set; }
 
         /// <summary>
         /// Child entities of this entity.
         /// </summary>
-        [JsonProperty(PropertyName = "modelAttributes")]
+        [JsonProperty(PropertyName = "attributes")]
         public List<Entity>? Children { get; set; }
+
+        /// <summary>
+        /// Roles of this entity, only applies to data classes.
+        /// </summary>
+        public List<Role>? Roles { get; set; }
 
         #endregion
 
@@ -85,11 +78,11 @@ namespace PIQI_Engine.Server.Models
         /// <param name="mnemonic">
         /// The mnemonic identifier for the entity.
         /// </param>
-        public Entity(string fieldName, string name, string mnemonic)
+        public Entity(string name, string mnemonic)
         {
-            Name = ShortName = name;
-            FieldName = fieldName;
+            Name = ShortName = FieldName = name;
             Mnemonic = mnemonic;
+            EntityType = new EntityType(EntityDataTypeEnum.ROOT);
 
             Children = new List<Entity>();
         }
@@ -114,8 +107,9 @@ namespace PIQI_Engine.Server.Models
             ShortName = entityBase.ShortName;
             FieldName = entityBase.FieldName;
             Description = entityBase.Description;
-            DataTypeID = entityBase.DataTypeID;
-            CardinalityID = cardinality;
+            EntityType = entityBase.EntityType;
+            if (cardinality.HasValue)
+                Cardinality = new Cardinality(cardinality.Value);
 
             Children = new List<Entity>();
         }

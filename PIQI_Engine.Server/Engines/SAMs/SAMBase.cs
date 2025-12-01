@@ -15,10 +15,10 @@ namespace PIQI_Engine.Server.Engines.SAMs
         public SAM SAMObject { get; }
 
         /// <summary>
-        /// Provides access to the <see cref="SAMReferenceDataService"/> service
+        /// Provides access to the <see cref="SAMService"/> service
         /// used for accessing reference data and performing FHIR resource lookups.
         /// </summary>
-        protected readonly SAMReferenceDataService _SAMReferenceDataService;
+        protected readonly SAMService _SAMService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SAMBase"/> class.
@@ -27,13 +27,13 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// The parent <see cref="SAM"/> object that defines the configuration and context
         /// for this evaluator.
         /// </param>
-        /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to access reference data and make FHIR API calls.
+        /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        protected SAMBase(SAM sam, SAMReferenceDataService referenceDataService)
+        protected SAMBase(SAM sam, SAMService samService)
         {
             SAMObject = sam;
-            _SAMReferenceDataService = referenceDataService;
+            _SAMService = samService;
         }
 
         /// <summary>

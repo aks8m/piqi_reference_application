@@ -12,10 +12,10 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// Initializes a new instance of the <see cref="SAM_AttrIsInList"/> class.
         /// </summary>
         /// <param name="sam">The SAM object associated with this evaluator.</param>
-        /// /// <param name="referenceDataService">
-        /// An implementation of <see cref="SAMReferenceDataService"/> used to access reference data and make FHIR API calls.
+        /// /// <param name="samService">
+        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public SAM_AttrIsInList(SAM sam, SAMReferenceDataService referenceDataService) : base(sam, referenceDataService) { }
+        public SAM_AttrIsInList(SAM sam, SAMService samService) : base(sam, samService) { }
 
         /// <summary>
         /// Evaluates whether the attribute of a message model item matches a list of valid values.
@@ -57,8 +57,8 @@ namespace PIQI_Engine.Server.Engines.SAMs
                 {
                     // Process required parms
                     if (request.ParmList == null) throw new Exception("Parameter list was not supplied");
-                    Tuple<string, string> arg1 = request.ParmList.Where(t => t.Item1 == "Valid Attribute List").FirstOrDefault();
-                    if (arg1 == null) throw new Exception("[Valid Attribute List] parameter not found");
+                    Tuple<string, string> arg1 = request.ParmList.Where(t => t.Item1 == "LIST_CSV").FirstOrDefault();
+                    if (arg1 == null) throw new Exception("[List CSV] parameter not found");
                     string arg1Value = arg1.Item2;
 
                     // Split the list and evaluate if the data exists in it (case-insensitive)

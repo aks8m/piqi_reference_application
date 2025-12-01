@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PIQI_Engine.Server.Services;
+using System.Text;
 using System.Text.Json;
 
 namespace PIQI_Engine.Server.Models
@@ -129,6 +130,24 @@ namespace PIQI_Engine.Server.Models
                         CodeSystem = codeSystem;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Coding"/> class from a <see cref="JsonElement"/>.
+        /// </summary>
+        /// <param name="jElement">The JSON element representing the coding.</param>
+        public Coding(JsonElement jElement)
+        {
+            ReferenceDisplayList = new List<string>();
+
+            if (jElement.TryGetProperty("code", out JsonElement code))
+            {
+                CodeValue = code.GetString();
+            }
+            if (jElement.TryGetProperty("system", out JsonElement system))
+            {
+                CodeSystem = system.GetString();
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -239,7 +258,6 @@ namespace PIQI_Engine.Server.Models
                 // Swallow exceptions for async helper
             }
         }
-
         #endregion
     }
 }

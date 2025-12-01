@@ -33,11 +33,6 @@ namespace PIQI_Engine.Server.Models
         public string? RootEntityName { get; set; }
 
         /// <summary>
-        /// The root field name the model is build against.
-        /// </summary>
-        public string? RootEntityFieldName { get; set; }
-
-        /// <summary>
         /// The root mnemonic the model is build against.
         /// </summary>
         public string? RootEntityMnemonic { get; set; }
@@ -135,7 +130,6 @@ namespace PIQI_Engine.Server.Models
         /// The following properties must also be set before calling:
         /// <list type="bullet">
         ///   <item><description><see cref="DataTypeList"/></description></item>
-        ///   <item><description><see cref="RootEntityFieldName"/></description></item>
         ///   <item><description><see cref="RootEntityName"/></description></item>
         ///   <item><description><see cref="EntityModel"/></description></item>
         /// </list>
@@ -146,7 +140,7 @@ namespace PIQI_Engine.Server.Models
             try
             {
                 if (referenceData != null) RefData = referenceData;
-                string? rootName = RootEntityFieldName ?? RootEntityName;
+                string? rootName = RootEntityName;
                 if (DataTypeList == null) throw new Exception("DataTypeList not initialized");
                 if (EntityModel == null) throw new Exception("Entity model not loaded");
                 if (rootName == null) throw new Exception("Root not loaded");
@@ -194,7 +188,7 @@ namespace PIQI_Engine.Server.Models
                     ClassDict.Add(key, classItem);
 
                     // Process elements (Classes -> Elements -> Attributes)
-                    if (classEntity.CardinalityID == CardinalityEnum.One)
+                    if (classEntity.Cardinality?.CardinalityValue == CardinalityEnum.ONE)
                         ProcessSingletonElement(classItem, jProperty);
                     else
                         ProcessElements(classItem, jProperty); 
@@ -267,7 +261,7 @@ namespace PIQI_Engine.Server.Models
             {
                 foreach (JProperty jProperty in ((JObject)jToken).Properties())      // Properties of the element
                 {
-                    Entity? attributeEntity = attributeEntityList?.FirstOrDefault(ae => string.Equals(ae.Name, jProperty.Name, StringComparison.OrdinalIgnoreCase));
+                    Entity? attributeEntity = attributeEntityList?.FirstOrDefault(ae => string.Equals(ae.FieldName, jProperty.Name, StringComparison.OrdinalIgnoreCase));
                     if (attributeEntity != null)
                     {
                         // Create the attribute item
@@ -275,7 +269,7 @@ namespace PIQI_Engine.Server.Models
                         attributeItem = new MessageModelItem(attributeEntity, elementItem, classItem.Entity, key, EntityItemTypeEnum.Attribute);
 
                         // Evaluate the attr type
-                        if (attributeEntity.DataTypeID == EntityDataTypeEnum.CC)
+                        if (attributeEntity.EntityType.EntityTypeValue == EntityDataTypeEnum.CC)
                         {
                             if (jProperty.Children<JObject>().Count() > 0)
                             {
@@ -290,7 +284,7 @@ namespace PIQI_Engine.Server.Models
                                 attributeItem.MessageData = new CodeableConcept(jProperty, RefData);
                             }
                         }
-                        else if (attributeEntity.DataTypeID == EntityDataTypeEnum.OBSVAL)
+                        else if (attributeEntity.EntityType.EntityTypeValue == EntityDataTypeEnum.OBSVAL)
                         {
                             if (jProperty.Children<JObject>().Count() > 0)
                             {
@@ -305,7 +299,7 @@ namespace PIQI_Engine.Server.Models
                                 attributeItem.MessageData = new Value(jProperty, DataTypeList, RefData);
                             }
                         }
-                        else if (attributeEntity.DataTypeID == EntityDataTypeEnum.RV)
+                        else if (attributeEntity.EntityType.EntityTypeValue == EntityDataTypeEnum.RV)
                         {
                             if (jProperty.Children<JObject>().Count() > 0)
                             {

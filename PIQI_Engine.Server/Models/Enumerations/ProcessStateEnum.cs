@@ -1,28 +1,28 @@
 ﻿namespace PIQI_Engine.Server.Models
 {
     /// <summary>
-    /// Represents the current state of a processing method or task.
+    /// Represents the current state of a SAM (Scoring and Analysis Model) processing evaluation.
     /// </summary>
     public enum ProcessStateEnum
     {
         /// <summary>
-        /// The process has not yet started.
+        /// The SAM evaluation has not yet been processed.
         /// </summary>
         Pending = 0,
 
         /// <summary>
-        /// The process is currently in progress.
+        /// The SAM evaluation completed successfully.
         /// </summary>
-        Processing = 1,
+        Passed = 1,
 
         /// <summary>
-        /// The process completed successfully.
+        /// The SAM evaluation failed.
         /// </summary>
-        Succeeded = 2,
+        Failed = 2,
 
         /// <summary>
-        /// The process failed during execution.
+        /// The SAM evaluation was skipped.
         /// </summary>
-        Failed = 3
+        Skipped = 3
     }
 }
