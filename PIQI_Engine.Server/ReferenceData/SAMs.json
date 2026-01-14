@@ -1,8 +1,83 @@
 {
   "SAMLibrary": [
     {
+      "mnemonic": "A_CORY_SAM",
+      "name": "A Cory Sam",
+      "inputType": "ATR",
+      "HDQTDimensionMnemonic": "CONF_INCOMP",
+      "createdDateTime": "2025-10-17T13:47:29.657",
+      "modifiedDateTime": "2025-10-17T13:47:29.660",
+      "Source": {
+        "Name": "PIQI Alliance",
+        "Mnemonic": "PIQI.ALLIANCE"
+      },
+      "parameters": [
+        {
+          "name": "Range Set Param",
+          "Mnemonic": "RANGE_SET_PARAM",
+          "parameterValueTypeName": "Range Set",
+          "isOptional": "false"
+        },
+        {
+          "name": "Regex Param",
+          "Mnemonic": "REGEX_PARAM",
+          "parameterValueTypeName": "Regular Expression",
+          "isOptional": "false"
+        },
+        {
+          "name": "Detection Param",
+          "Mnemonic": "DETECTION_PARAM",
+          "parameterValueTypeName": "Detection Set",
+          "isOptional": "false"
+        },
+        {
+          "name": "Model Class Param",
+          "Mnemonic": "MODEL_CLASS_PARAM",
+          "parameterValueTypeName": "Model Class",
+          "isOptional": "false"
+        },
+        {
+          "name": "Simple Value Param",
+          "Mnemonic": "SIMPLE_VALUE_PARAM",
+          "parameterValueTypeName": "Simple Value",
+          "isOptional": "false"
+        },
+        {
+          "name": "Value Set Param",
+          "Mnemonic": "VALUE_SET_PARAM",
+          "parameterValueTypeName": "Value Set",
+          "isOptional": "false"
+        },
+        {
+          "name": "Simple List Param",
+          "Mnemonic": "SIMPLE_LIST_PARAM",
+          "parameterValueTypeName": "Simple List (CSV)",
+          "isOptional": "false"
+        },
+        {
+          "name": "Content Set Param",
+          "Mnemonic": "CONTENT_SET_PARAM",
+          "parameterValueTypeName": "Content Set",
+          "isOptional": "false"
+        },
+        {
+          "name": "Model Attr Param",
+          "Mnemonic": "MODEL_ATTR_PARAM",
+          "parameterValueTypeName": "Model Attribute",
+          "isOptional": "false"
+        },
+        {
+          "name": "Code System Param",
+          "Mnemonic": "CODE_SYSTEM_PARAM",
+          "parameterValueTypeName": "Code System",
+          "isOptional": "false"
+        }
+      ]
+    },
+    {
       "mnemonic": "ATTR_INEXTERNALLIST",
       "name": "Attribute Is In External List",
+      "FailName": "not in code list",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "conditionalSAMMnemonic": "ATTR_ISPOPULATED",
@@ -26,6 +101,7 @@
     {
       "mnemonic": "ATTR_INLIST",
       "name": "Attribute Is In List",
+      "FailName": "not in value list",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "conditionalSAMMnemonic": "ATTR_ISPOPULATED",
@@ -79,6 +155,7 @@
     {
       "mnemonic": "ATTR_ISCODED",
       "name": "Attribute Is Coded",
+      "FailName": "invalid coded entity",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -93,6 +170,7 @@
     {
       "mnemonic": "ATTR_ISDATE",
       "name": "Attribute Is Date",
+      "FailName": "invalid date",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -107,6 +185,7 @@
     {
       "mnemonic": "ATTR_ISDECIMAL",
       "name": "Attribute Is Decimal",
+      "FailName": "invalid decimal",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -136,6 +215,7 @@
     {
       "mnemonic": "ATTR_ISINTEGER",
       "name": "Attribute Is Integer",
+      "FailName": "invalid integer",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -150,6 +230,7 @@
     {
       "mnemonic": "ATTR_ISNEGATIVENUMBER",
       "name": "Attribute Is Negative Number",
+      "FailName": "invalid negative integer",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISINTEGER",
       "HDQTDimensionMnemonic": "ACC_INVVAL",
@@ -164,6 +245,7 @@
     {
       "mnemonic": "ATTR_ISNUMERIC",
       "name": "Attribute Is Numeric",
+      "FailName": "invalid number",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -178,6 +260,7 @@
     {
       "mnemonic": "ATTR_ISPASTDATE",
       "name": "Attribute Is Past Date",
+      "FailName": "invalid past date",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISDATE",
       "HDQTDimensionMnemonic": "ACC_INVVAL",
@@ -192,6 +275,7 @@
     {
       "mnemonic": "ATTR_ISPOPULATED",
       "name": "Attribute Is Populated",
+      "FailName": "unpopulated",
       "inputType": "ATR",
       "HDQTDimensionMnemonic": "AV_UNPOP",
       "executionTypeMnemonic": "STANDALONE",
@@ -205,6 +289,7 @@
     {
       "mnemonic": "ATTR_ISPOSITIVENUMBER",
       "name": "Attribute Is Positive Number",
+      "FailName": "invalid positive integer",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISINTEGER",
       "HDQTDimensionMnemonic": "ACC_INVVAL",
@@ -234,6 +319,7 @@
     {
       "mnemonic": "ATTR_ISTIMESTAMP",
       "name": "Attribute Is TimeStamp",
+      "FailName": "invalid date time",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -248,6 +334,7 @@
     {
       "mnemonic": "ATTR_ISTIMESTAMPTZ",
       "name": "Attribute Is TimeStamp with TimeZone",
+      "FailName": "invalid date time",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISTIMESTAMP",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -262,6 +349,7 @@
     {
       "mnemonic": "ATTR_MATCHESREGEX",
       "name": "Attribute Matches Regex",
+      "FailName": "regex mismatch",
       "inputType": "ATR",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -397,6 +485,7 @@
     {
       "mnemonic": "CONCEPT_HASCODE",
       "name": "Codeable Concept has Code",
+      "FailName": "code unpopulated",
       "inputType": "CC",
       "prerequisiteSAMMnemonic": "CONCEPT_HASDISPLAY",
       "HDQTDimensionMnemonic": "AV_UNPOP",
@@ -411,6 +500,7 @@
     {
       "mnemonic": "CONCEPT_HASCODESYSTEM",
       "name": "Codeable Concept has Code System",
+      "FailName": "system unpopulated",
       "inputType": "CC",
       "prerequisiteSAMMnemonic": "CONCEPT_HASCODE",
       "HDQTDimensionMnemonic": "AV_UNPOP",
@@ -425,6 +515,7 @@
     {
       "mnemonic": "CONCEPT_HASDISPLAY",
       "name": "Codeable Concept has Display",
+      "FailName": "display unpopulated",
       "inputType": "CC",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "AV_UNPOP",
@@ -454,6 +545,7 @@
     {
       "mnemonic": "CONCEPT_ISACTIVE",
       "name": "Codeable Concept is Active",
+      "FailName": "inactive concept",
       "inputType": "CC",
       "prerequisiteSAMMnemonic": "CONCEPT_ISVALID",
       "HDQTDimensionMnemonic": "CONF_OBSOL",
@@ -468,6 +560,7 @@
     {
       "mnemonic": "CONCEPT_ISCOMPLETE",
       "name": "Codeable Concept is Complete",
+      "FailName": "incomplete",
       "inputType": "CC",
       "prerequisiteSAMMnemonic": "CONCEPT_HASCODESYSTEM",
       "HDQTDimensionMnemonic": "AV_INCOMP",
@@ -497,6 +590,7 @@
     {
       "mnemonic": "CONCEPT_ISVALID",
       "name": "Codeable Concept is Valid Concept",
+      "FailName": "invalid concept",
       "inputType": "CC",
       "prerequisiteSAMMnemonic": "CONCEPT_HASRECOGNIZEDCODESYSTEM",
       "conditionalSAMMnemonic": "ATTR_ISCODED",
@@ -512,6 +606,7 @@
     {
       "mnemonic": "CONCEPT_ISVALIDMEMBER",
       "name": "Codeable Concept is Valid Member",
+      "FailName": "incompatible concept",
       "inputType": "CC",
       "prerequisiteSAMMnemonic": "CONCEPT_ISVALID",
       "conditionalSAMMnemonic": "ATTR_ISCODED",
@@ -528,6 +623,26 @@
           "name": "Code System CSV",
           "Mnemonic": "CODE_SYSTEM_CSV",
           "parameterValueTypeName": "Code System",
+          "isOptional": "false"
+        }
+      ]
+    },
+    {
+      "mnemonic": "CORY_VALUESET_DETECTION",
+      "name": "Cory ValueSet Detection",
+      "HDQTDimensionMnemonic": "AV_UNPOP",
+      "executionTypeMnemonic": "STANDALONE",
+      "createdDateTime": "2025-10-17T20:23:07.997",
+      "modifiedDateTime": "2025-10-17T20:23:07.997",
+      "Source": {
+        "Name": "PIQI Alliance",
+        "Mnemonic": "PIQI.ALLIANCE"
+      },
+      "parameters": [
+        {
+          "name": "ValueSet Group Mnemonic",
+          "Mnemonic": "VALUESET_GROUP_MNEMONIC",
+          "parameterValueTypeName": "Detection Set",
           "isOptional": "false"
         }
       ]
@@ -1070,6 +1185,7 @@
     {
       "mnemonic": "RANGEVALUE_ISVALID",
       "name": "Range Value Is Valid",
+      "FailName": "invalid ref range",
       "inputType": "RV",
       "prerequisiteSAMMnemonic": "ATTR_ISPOPULATED",
       "HDQTDimensionMnemonic": "ACC_INVFMT",
@@ -1084,7 +1200,7 @@
     {
       "mnemonic": "VALUESET_DETECTION",
       "name": "ValueSet Detection",
-      "inputType": "ATR",
+      "inputType": "ROOT",
       "HDQTDimensionMnemonic": "AV_UNPOP",
       "executionTypeMnemonic": "STANDALONE",
       "createdDateTime": "2025-08-07T14:25:10.063",

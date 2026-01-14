@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PIQI_Engine.Server.Engines.SAMs;
 using PIQI_Engine.Server.Models;
@@ -253,8 +253,7 @@ namespace PIQI_Engine.Server.Engines
                     await ProcessElementAsync(message, elementEvalItem);
                 }
 
-                // Process class level criteria
-                // Get criteria
+                // Get criteria for this class
                 List<EvaluationCriterion> critList = message.GetCriteriaList(classEvaluationItem.Entity.Mnemonic);
 
                 foreach (EvaluationCriterion criterion in critList.OrderBy(t => t.Sequence))
@@ -279,8 +278,7 @@ namespace PIQI_Engine.Server.Engines
                     await ProcessAttributeAsync(message, attrEvalItem);
                 }
 
-                // Process element level criteria
-                // Get criteria
+                // Get criteria for this element
                 List<EvaluationCriterion> critList = message.GetCriteriaList(elementEvaluationItem.Entity.Mnemonic);
 
                 foreach (EvaluationCriterion criterion in critList.OrderBy(t => t.Sequence))
@@ -434,7 +432,7 @@ namespace PIQI_Engine.Server.Engines
                     PIQISAMResponse? samResult = null;
 
                     // Create SAM request object
-                    samRequest.EvaluationObject = evaluationResult.EvaluationItem.MessageItem;
+                    samRequest.EvaluationObject = evaluationResult.EvaluationItem;
                     if (evaluationCriteriaParameters != null && evaluationCriteriaParameters.Count > 0)
                     {
                         // Add processing URL as a parameter
