@@ -52,8 +52,14 @@ public partial class Program
             client.BaseAddress = new Uri(baseUrl);
             client.DefaultRequestHeaders.Add("Accept", "application/fhir+json");
         });
+
         // Client for API SAMs, etc.
-        builder.Services.AddHttpClient();
+        builder.Services.AddHttpClient<IKnowledgeClientProvider, KnowledgeClientProvider>(client =>
+        {
+            var baseUrl = builder.Configuration["Knowledge:BaseUrl"];
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+        });
 
         builder.Services.AddScoped<SAMService>();
 

@@ -48,6 +48,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
             PIQISAMResponse result = new();
             bool passed = false;
 
+            _SAMService.checkPlausabilityAsync(Guid.Empty, null);
             try
             {
                 // // Set the message model item

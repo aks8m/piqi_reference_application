@@ -18,6 +18,8 @@ namespace PIQI_Engine.Server.Services
         /// </summary>
         protected readonly IFHIRClientProvider _fhirClientProvider;
 
+        protected readonly IKnowledgeClientProvider _knowledgeClientProvider;
+
         /// <summary>
         /// Gets the <see cref="HttpClient"/> instance used to make HTTP requests to the FHIR server.
         /// </summary>
@@ -46,9 +48,10 @@ namespace PIQI_Engine.Server.Services
         /// <exception cref="ArgumentNullException">
         /// Thrown if <paramref name="fhirClientProvider"/> is <c>null</c>.
         /// </exception>
-        public SAMService(IFHIRClientProvider fhirClientProvider, HttpClient client)
+        public SAMService(IFHIRClientProvider fhirClientProvider, IKnowledgeClientProvider knowledgeClientProvider, HttpClient client)
         {
             _fhirClientProvider = fhirClientProvider ?? throw new ArgumentNullException(nameof(fhirClientProvider));
+            _knowledgeClientProvider = knowledgeClientProvider ?? throw new ArgumentNullException(nameof(knowledgeClientProvider));
             Client = client;
         }
 
@@ -214,6 +217,18 @@ namespace PIQI_Engine.Server.Services
                 }
 
                 return valueSet;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<HttpResponseMessage> checkPlausabilityAsync(Guid patternId, List<string> codes)
+        {
+            try
+            {
+                return await _knowledgeClientProvider.checkPlausabilityAsync(patternId, codes);
             }
             catch
             {
