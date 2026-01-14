@@ -426,6 +426,20 @@
       "criticalityIndicator": false,
       "samParameters": [],
       "conditionalSamParameters": []
+    },
+    {
+      "sequence": 24,
+      "description": "Check plausibility of lab data",
+      "entity": "LAB_ELEMENT",
+      "samMnemonic": "KNOWLEDGE_IS_PLAUSIBLE",
+      "samNameOverride": "Lab Knowledge Plausibility Check",
+      "failureNameOverride": "Lab Knowledge Plausibility Check Failed",
+      "conditionalSam": null,
+      "scoringEffect": "Scoring",
+      "scoringWeight": 1,
+      "criticalityIndicator": true,
+      "samParameters": [],
+      "conditionalSamParameters": []
     }
   ]
 }

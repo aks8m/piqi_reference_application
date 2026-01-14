@@ -358,9 +358,9 @@ namespace PIQI_Engine.Server.Models
                         else if (result.EvalFailed)
                         {
                             attrNode.Add("status", "Failed");
-                            attrNode.Add("reason", result.Reason ?? 
-                                (result.FailSamMnemonic == result.Criterion.SAMMnemonic ? 
-                                (result.Criterion.FailureNameOverride ?? result.Criterion.SamNameOverride ?? RefData.GetSAM(result.FailSamMnemonic ?? "")?.FailName ?? RefData.GetSAM(result.FailSamMnemonic ?? "")?.Name) : 
+                            attrNode.Add("reason", result.Reason ??
+                                (result.FailSamMnemonic == result.Criterion.SAMMnemonic ?
+                                (result.Criterion.FailureNameOverride ?? result.Criterion.SamNameOverride ?? RefData.GetSAM(result.FailSamMnemonic ?? "")?.FailName ?? RefData.GetSAM(result.FailSamMnemonic ?? "")?.Name) :
                                 (RefData.GetSAM(result.FailSamMnemonic ?? "")?.FailName ?? RefData.GetSAM(result.FailSamMnemonic ?? "")?.Name)));
                             if (result.IsScoring)
                             {
@@ -475,12 +475,11 @@ namespace PIQI_Engine.Server.Models
                     #endregion
 
                     #region Element-Level SAMs
+                    "KNOWLEDGE_IS_PLAUSIBLE" => new SAM_KnowledgeIsPlausible(sam, samService),
                     #endregion
-
 
                     "Custom_External_Assessment" => new SAM_CustomExternalAssessment(sam, samService),
                     "EVAL_ISVALID" => new SAM_EvalIsValid(sam, samService),
-
                     _ => new SAM_Default(sam, samService)
                 };
             }

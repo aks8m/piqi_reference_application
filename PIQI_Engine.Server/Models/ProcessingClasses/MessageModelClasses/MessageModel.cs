@@ -182,6 +182,7 @@ namespace PIQI_Engine.Server.Models
                     // Create the class item
                     string key = $"{RootItem.Mnemonic}|{classEntity.Mnemonic}";
                     MessageModelItem classItem = new MessageModelItem(classEntity, RootItem, classEntity, key, EntityItemTypeEnum.Class);
+                    classItem.MessageText = jProperty.ToString();
 
                     // Add to root and dict
                     RootItem.AddChildItem(classItem);
@@ -216,6 +217,7 @@ namespace PIQI_Engine.Server.Models
                 // Create the element item
                 string key = $"{RootItem.Mnemonic}|{classItem.Mnemonic}|{elementEntity.Mnemonic}.{sequence}";
                 MessageModelItem elementItem = new MessageModelItem(elementEntity, classItem, classItem.Entity, key, EntityItemTypeEnum.Element);
+                elementItem.MessageText = jToken.ToString();
 
                 // Add to class and dictionary
                 classItem.AddChildItem(elementItem, $"{elementEntity.Mnemonic}.{sequence}");
@@ -239,6 +241,7 @@ namespace PIQI_Engine.Server.Models
             // Create the element item
             string key = $"{RootItem.Mnemonic}|{classItem.Mnemonic}|{elementEntity.Mnemonic}.1";
             MessageModelItem elementItem = new MessageModelItem(elementEntity, classItem, classItem.Entity, key, EntityItemTypeEnum.Element);
+            elementItem.MessageText = propertyToken.ToString();
 
             // Add to class and dictionary
             classItem.AddChildItem(elementItem, $"{elementEntity.Mnemonic}.1");

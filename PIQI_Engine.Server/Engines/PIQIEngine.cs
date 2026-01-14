@@ -252,6 +252,15 @@ namespace PIQI_Engine.Server.Engines
                 {
                     await ProcessElementAsync(message, elementEvalItem);
                 }
+
+                // Process class level criteria
+                // Get criteria
+                List<EvaluationCriterion> critList = message.GetCriteriaList(classEvaluationItem.Entity.Mnemonic);
+
+                foreach (EvaluationCriterion criterion in critList.OrderBy(t => t.Sequence))
+                {
+                    await ProcessCriteriaSAMAsync(message, classEvaluationItem, criterion);
+                }
             }
             catch
             {
@@ -268,6 +277,15 @@ namespace PIQI_Engine.Server.Engines
                 foreach (EvaluationItem attrEvalItem in elementEvaluationItem.ChildDict.Values.OrderBy(t => t.Entity.Name))
                 {
                     await ProcessAttributeAsync(message, attrEvalItem);
+                }
+
+                // Process element level criteria
+                // Get criteria
+                List<EvaluationCriterion> critList = message.GetCriteriaList(elementEvaluationItem.Entity.Mnemonic);
+
+                foreach (EvaluationCriterion criterion in critList.OrderBy(t => t.Sequence))
+                {
+                    await ProcessCriteriaSAMAsync(message, elementEvaluationItem, criterion);
                 }
             }
             catch

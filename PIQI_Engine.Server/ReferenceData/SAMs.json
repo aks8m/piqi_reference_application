@@ -1101,6 +1101,19 @@
           "isOptional": "false"
         }
       ]
+    },
+    {
+      "mnemonic": "KNOWLEDGE_IS_PLAUSIBLE",
+      "name": "Knowledge Plausibility Check",
+      "inputType": "ELM",
+      "HDQTDimensionMnemonic": "Plausibility.Clinical",
+      "executionTypeMnemonic": "RESTful_Service",
+      "createdDateTime": "2026-01-12T11:42:05.123",
+      "modifiedDateTime": "2026-01-12T11:42:05.123",
+      "Source": {
+        "Name": "IKE",
+        "Mnemonic": "IKE.DEX"
+      }
     }
   ]
 }
