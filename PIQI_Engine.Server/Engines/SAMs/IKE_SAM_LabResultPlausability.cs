@@ -1,5 +1,6 @@
 ﻿using PIQI_Engine.Server.Models;
 using PIQI_Engine.Server.Services;
+using Newtonsoft.Json.Linq;
 
 namespace PIQI_Engine.Server.Engines.SAMs
 {
@@ -7,7 +8,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
     /// SAM (Semantic Assessment Module) that evaluates whether a <see cref="CodeableConcept"/>
     /// contains at least one valid coding according to the FHIR server.
     /// </summary>
-    public class SAM_KnowledgeIsPlausible : SAMBase
+    public class IKE_SAM_LabResultPlausability : SAMBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SAM_ConceptIsValid"/> class.
@@ -16,7 +17,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// <param name="samService">
         /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public SAM_KnowledgeIsPlausible(SAM sam, SAMService samService)
+        public IKE_SAM_LabResultPlausability(SAM sam, SAMService samService)
             : base(sam, samService) { }
 
         /// <summary>
@@ -48,9 +49,18 @@ namespace PIQI_Engine.Server.Engines.SAMs
             PIQISAMResponse result = new();
             bool passed = false;
 
-            _SAMService.checkPlausabilityAsync(Guid.Empty, null);
             try
             {
+                // Set the message model item
+                EvaluationItem evaluationItem = (EvaluationItem)request.EvaluationObject;
+                MessageModelItem item = evaluationItem?.MessageItem;
+                JToken token = JToken.Parse(item.MessageText);
+
+                System.Console.WriteLine("LAB RESULT PLAUSABILITY");
+
+                // _SAMService.checkPlausabilityAsync(Guid.Empty, null);
+
+
                 // // Set the message model item
                 // MessageModelItem item = (MessageModelItem)request.MessageObject;
 

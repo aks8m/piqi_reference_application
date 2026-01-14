@@ -152,6 +152,7 @@ namespace PIQI_Engine.Server.Models
                 if (rootToken == null) throw new Exception("Root token not found");
 
                 RootItem = new MessageModelItem(EntityModel.Root, null, null, EntityModel.Root.Mnemonic, EntityItemTypeEnum.Root);
+                RootItem.MessageText = rootToken.ToString();
 
                 ProcessClasses(rootToken);
             }

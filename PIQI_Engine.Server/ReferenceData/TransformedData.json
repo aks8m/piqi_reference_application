@@ -522,6 +522,60 @@
         "test": {
           "codings": [
             {
+              "code": "718-7",
+              "display": "Hemoglobin",
+              "system": "2.16.840.1.113883.6.1"
+            }
+          ],
+          "text": "Hemoglobin"
+        },
+        "order": {
+          "codings": [
+            {
+              "code": "57021-8",
+              "display": "CBC W Auto Differential panel in Blood",
+              "system": "2.16.840.1.113883.6.1"
+            }
+          ],
+          "text": "CBC W Auto Differential panel in Blood"
+        },
+        "orderDate": "03/19/2008 08:30:00-0800",
+        "performedDateTime": "03/19/2008 08:30:00-0800",
+        "referenceRange": {
+          "lowValue": "12.0",
+          "highValue": "15.5"
+        },
+        "resultValue": {
+          "text": "13.2",
+          "type": {
+            "text": "PQ"
+          }
+        },
+        "resultUnit": {
+          "text": "g/dL"
+        },
+        "interpretation": {
+          "codings": [
+            {
+              "code": "N",
+              "system": "2.16.840.1.113883.5.83"
+            }
+          ],
+          "text": "N"
+        },
+        "resultStatus": {
+          "codings": [
+            {
+              "code": "completed"
+            }
+          ],
+          "text": "completed"
+        }
+      },
+      {
+        "test": {
+          "codings": [
+            {
               "code": "6690-2",
               "display": "Leukocytes",
               "system": "2.16.840.1.113883.6.1"

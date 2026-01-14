@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using PIQI_Engine.Server.Engines.SAMs;
 using PIQI_Engine.Server.Services;
 
@@ -476,6 +476,11 @@ namespace PIQI_Engine.Server.Models
 
                     #region Element-Level SAMs
                     "ELEMENT_ISCLEAN" => new SAM_ElementIsClean(sam, samService),
+                    #endregion
+
+                    #region IKE SAMs
+                    "LAB_RESULT_PLAUSIBILITY" => new IKE_SAM_LabResultPlausability(sam, samService),
+                    "LAB_DEVICE_VERIFIABILITY" => new IKE_SAM_LabDeviceVerafiability(sam, samService),
                     #endregion
 
                     "Custom_External_Assessment" => new SAM_CustomExternalAssessment(sam, samService),

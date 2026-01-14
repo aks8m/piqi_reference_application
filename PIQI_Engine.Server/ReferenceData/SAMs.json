@@ -1219,17 +1219,46 @@
       ]
     },
     {
-      "mnemonic": "KNOWLEDGE_IS_PLAUSIBLE",
-      "name": "Knowledge Plausibility Check",
-      "inputType": "ELM",
-      "HDQTDimensionMnemonic": "Plausibility.Clinical",
+      "mnemonic": "LAB_RESULT_PLAUSIBILITY",
+      "name": "Knowledge-based Lab Result Plausibility Check",
+      "inputType": "ROOT",
+      "HDQTDimensionMnemonic": "Plausibility.Lab.Result",
       "executionTypeMnemonic": "RESTful_Service",
       "createdDateTime": "2026-01-12T11:42:05.123",
       "modifiedDateTime": "2026-01-12T11:42:05.123",
       "Source": {
         "Name": "IKE",
         "Mnemonic": "IKE.DEX"
-      }
+      },
+      "parameters": [
+        {
+          "name": "Knowledge Pattern Id",
+          "Mnemonic": "IKE_PATTERN_ID",
+          "parameterValueTypeName": "Simple Value",
+          "isOptional": "false"
+        }
+      ]
+    },
+    {
+      "mnemonic": "LAB_DEVICE_VERIFIABILITY",
+      "name": "Knowledge-based Lab Device Verifiability Check",
+      "inputType": "ELM",
+      "HDQTDimensionMnemonic": "Verifiability.Lab.Device",
+      "executionTypeMnemonic": "RESTful_Service",
+      "createdDateTime": "2026-01-12T11:42:05.123",
+      "modifiedDateTime": "2026-01-12T11:42:05.123",
+      "Source": {
+        "Name": "IKE",
+        "Mnemonic": "IKE.DEX"
+      },
+      "parameters": [
+        {
+          "name": "Knowledge Pattern Id",
+          "Mnemonic": "IKE_PATTERN_ID",
+          "parameterValueTypeName": "Simple Value",
+          "isOptional": "false"
+        }
+      ]
     }
   ]
 }
