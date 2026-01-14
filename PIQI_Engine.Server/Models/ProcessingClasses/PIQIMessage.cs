@@ -475,6 +475,7 @@ namespace PIQI_Engine.Server.Models
                     #endregion
 
                     #region Element-Level SAMs
+                    "ELEMENT_ISCLEAN" => new SAM_ElementIsClean(sam, samService),
                     #endregion
 
 

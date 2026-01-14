@@ -46,7 +46,8 @@ namespace PIQI_Engine.Server.Engines.SAMs
             try
             {
                 // Set the message model item
-                MessageModelItem item = (MessageModelItem)request.EvaluationObject;
+                EvaluationItem evaluationItem = (EvaluationItem)request.EvaluationObject;
+                MessageModelItem item = evaluationItem?.MessageItem;
 
                 // Evaluate the item's message data
                 BaseText data = (BaseText)item.MessageData;
