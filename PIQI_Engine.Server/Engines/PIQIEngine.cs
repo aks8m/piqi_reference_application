@@ -78,7 +78,7 @@ namespace PIQI_Engine.Server.Engines
         /// <param name="evaluation">Optional evaluation file to override or supplement evaluation rubrics.</param>
         /// <returns>A <see cref="PIQIResponse"/> containing the processed message, formatted statistics, and optionally the audited message.</returns>
         /// <exception cref="Exception">Thrown if the message processing fails, reference data cannot be loaded, or validation fails.</exception>
-        public async Task<PIQIResponse> PiqiRequestAsync(PIQIRequest piqiRequest, bool auditMode, IFormFile? evaluation = null) 
+        public async Task<PIQIResponse> PiqiRequestAsync(PIQIRequest piqiRequest, bool auditMode, IFormFile? evaluation = null)
         {
             // Create final result object
             PIQIResponse result = new PIQIResponse();
@@ -492,8 +492,10 @@ namespace PIQI_Engine.Server.Engines
                         // If there are no parameters in the criterion, the evaluation is invalid
                         if (evaluationCriterion.SAMParameters != null)
                         {
+                            //TODO-aks8m: This logic may need to use Mnemonics of the SAM parameters and Evaluation Criteria
                             EvaluationCriteriaParameter? evaluationCriteriaParameter = evaluationCriterion.SAMParameters.FirstOrDefault(ecsp => ecsp.ParameterName == samParameter.Name);
-                            if (evaluationCriteriaParameter == null || string.IsNullOrEmpty(evaluationCriteriaParameter.ParameterValue)) passed = false;
+                            if (evaluationCriteriaParameter == null || string.IsNullOrEmpty(evaluationCriteriaParameter.ParameterValue)) 
+                                passed = false;
                         }
                         else passed = false;
                     }

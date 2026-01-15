@@ -1,4 +1,5 @@
-﻿using PIQI_Engine.Server.Models;
+﻿using Newtonsoft.Json.Linq;
+using PIQI_Engine.Server.Models;
 using System.Net;
 using System.Text.Json;
 
@@ -124,7 +125,7 @@ namespace PIQI_Engine.Server.Services
                 foreach (Coding coding in codeableConcept.CodingList)
                 {
                     // Get all code system list identifiers based on the coding's recognized code system
-                    var codeSystem = coding.HasRecognizedCodeSystem? Message.RefData.GetCodeSystem(coding.RecognizedCodeSystem) : null;
+                    var codeSystem = coding.HasRecognizedCodeSystem ? Message.RefData.GetCodeSystem(coding.RecognizedCodeSystem) : null;
 
                     if (codeSystem?.FhirUri != null)
                     {
@@ -224,11 +225,60 @@ namespace PIQI_Engine.Server.Services
             }
         }
 
-        public async Task<HttpResponseMessage> checkPlausabilityAsync(Guid patternId, List<string> codes)
+        public async Task<string> CheckLabResultPlausibilityAsync(string dobString, string testCode, string resultValue, List<Tuple<string, string>>  coordinateParams)
         {
             try
             {
-                return await _knowledgeClientProvider.checkPlausabilityAsync(patternId, codes);
+                var response = await _knowledgeClientProvider.CheckLabResultPlausibilityAsync(dobString, testCode, resultValue, coordinateParams);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    JToken plausibilityResult = JToken.Parse(content);
+                    if (plausibilityResult != null)
+                    {
+                        return plausibilityResult.SelectToken("plausibility")?.ToString() ?? "Error";
+                    }
+                    return "Error";
+                }
+                else if (response.StatusCode != HttpStatusCode.BadRequest)
+                {
+                    throw new Exception($"Unexpected status code from Knowledge client provider: {response.StatusCode}");
+                }
+                else
+                {
+                    return "Error";
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<string> CheckLabDevicePlausibilityAsync(string testCode, string refRangeLow, string refRangeHigh, string unit, List<Tuple<string, string>>  coordinateParams)
+        {
+            try
+            {
+                var response = await _knowledgeClientProvider.CheckLabDevicePlausibilityAsync(testCode, refRangeLow, refRangeHigh, unit, coordinateParams);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    JToken plausibilityResult = JToken.Parse(content);
+                    if (plausibilityResult != null)
+                    {
+                        return plausibilityResult.SelectToken("plausibility")?.ToString() ?? "Error";
+                    }
+                    return "Error";
+                }
+                else if (response.StatusCode != HttpStatusCode.BadRequest)
+                {
+                    throw new Exception($"Unexpected status code from Knowledge client provider: {response.StatusCode}");
+                }
+                else
+                {
+                    return "Error";
+                }
             }
             catch
             {

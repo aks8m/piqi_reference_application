@@ -135,6 +135,8 @@ namespace PIQI_Engine.Server.Models
             }
         }
 
+        private static bool isRoot = true;
+
         /// <summary>
         /// Recursively processes a message model item and adds audit information to the JSON node.
         /// </summary>
@@ -142,13 +144,19 @@ namespace PIQI_Engine.Server.Models
         /// <param name="parentItem">The optional model item parent to process (Needed for element sequence on attribute).</param>
         /// <param name="parentNode">The parent JSON node to attach audit information.</param>
         /// <param name="entity">The optional entity to process. Used in tandem with item to include processed entities without item data</param>
-
         private void Audit_ProcessMessageModelItem(EvaluationItem evaluationItem, JToken parentNode)
         {
             try
             {
                 JObject? elementNode = null;
                 string itemName = evaluationItem?.Entity?.FieldName ?? evaluationItem?.Entity?.Name ?? "UNKNOWN";
+
+                if (isRoot)
+                {
+                    isRoot = false;
+
+                
+                }
 
                 if (evaluationItem.ItemType == EntityItemTypeEnum.Root)
                 {
@@ -480,7 +488,7 @@ namespace PIQI_Engine.Server.Models
 
                     #region IKE SAMs
                     "LAB_RESULT_PLAUSIBILITY" => new IKE_SAM_LabResultPlausability(sam, samService),
-                    "LAB_DEVICE_VERIFIABILITY" => new IKE_SAM_LabDeviceVerafiability(sam, samService),
+                    "LAB_DEVICE_PLAUSIBILITY" => new IKE_SAM_LabDevicePlausability(sam, samService),
                     #endregion
 
                     "Custom_External_Assessment" => new SAM_CustomExternalAssessment(sam, samService),

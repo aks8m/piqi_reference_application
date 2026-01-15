@@ -1,988 +1,1237 @@
 {
-  "messageId": "2.16.840.1.113883.19.5.99999.1",
-  "formatID": "CCD/CDA",
-  "useCaseID": "34133-9",
-  "patient": {
-    "allergies": [
-      {
-        "effectiveDate": "05/01/1998 00:00:00",
-        "reaction": {
-          "codings": [
-            {
-              "code": "ASSERTION",
-              "system": "2.16.840.1.113883.5.4"
-            }
-          ],
-          "text": "ASSERTION"
-        },
-        "severity": {
-          "codings": [
-            {
-              "code": "371924009",
-              "display": "Moderate to severe",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Moderate to severe"
-        },
-        "substance": {
-          "codings": [
-            {
-              "code": "70618",
-              "display": "Penicillin",
-              "system": "2.16.840.1.113883.6.88"
-            }
-          ],
-          "text": "Penicillin"
-        },
-        "category": {
-          "codings": [
-            {
-              "code": "ASSERTION",
-              "system": "2.16.840.1.113883.5.4"
-            }
-          ],
-          "text": "ASSERTION"
-        }
-      },
-      {
-        "effectiveDate": "",
-        "reaction": {
-          "codings": [
-            {
-              "code": "ASSERTION",
-              "system": "2.16.840.1.113883.5.4"
-            }
-          ],
-          "text": "ASSERTION"
-        },
-        "severity": {
-          "codings": [
-            {
-              "code": "255604002",
-              "display": "Mild",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Mild"
-        },
-        "substance": {
-          "codings": [
-            {
-              "code": "2670",
-              "display": "Codeine",
-              "system": "2.16.840.1.113883.6.88"
-            }
-          ],
-          "text": "Codeine"
-        },
-        "category": {
-          "codings": [
-            {
-              "code": "ASSERTION",
-              "system": "2.16.840.1.113883.5.4"
-            }
-          ],
-          "text": "ASSERTION"
-        }
-      }
-    ],
-    "conditions": [
-      {
-        "conditionType": {
-          "text": "Problem"
-        },
-        "condition": {
-          "codings": [
-            {
-              "code": "233604007",
-              "display": "Pneumonia",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Pneumonia"
-        },
-        "onsetDate": "07/03/2013 00:00:00",
-        "resolutionDate": "08/14/2008 00:00:00",
-        "conditionStatus": {
-          "codings": [
-            {
-              "code": "active"
-            }
-          ],
-          "text": "active"
-        }
-      },
-      {
-        "conditionType": {
-          "text": "Problem"
-        },
-        "condition": {
-          "codings": [
-            {
-              "code": "29857009",
-              "display": "Chest pain",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Chest pain"
-        },
-        "onsetDate": "04/14/2007 00:00:00",
-        "conditionStatus": {
-          "codings": [
-            {
-              "code": "active"
-            }
-          ],
-          "text": "active"
-        }
-      },
-      {
-        "conditionType": {
-          "text": "Problem"
-        },
-        "condition": {
-          "codings": [
-            {
-              "code": "194828000",
-              "display": "Angina",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Angina"
-        },
-        "onsetDate": "04/17/2007 00:00:00",
-        "conditionStatus": {
-          "codings": [
-            {
-              "code": "active"
-            }
-          ],
-          "text": "active"
-        }
-      },
-      {
-        "conditionType": {
-          "text": "Problem"
-        },
-        "condition": {
-          "codings": [
-            {
-              "code": "233604007",
-              "display": "Pneumonia",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Pneumonia"
-        },
-        "onsetDate": "03/10/1998 00:00:00",
-        "resolutionDate": "03/16/1998 00:00:00",
-        "conditionStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        }
-      }
-    ],
-    "demographics": {
-      "birthSex": {
+  "allergies": [
+    {
+      "effectiveDate": "05/01/1998 00:00:00",
+      "reaction": {
         "codings": [
           {
-            "code": "F",
-            "display": "Female",
-            "system": "2.16.840.1.113883.5.1"
+            "code": "ASSERTION",
+            "system": "2.16.840.1.113883.5.4"
           }
         ],
-        "text": "Female"
+        "text": "ASSERTION"
       },
-      "birthDate": "05/01/1975 00:00:00",
-      "ethnicity": {
+      "severity": {
         "codings": [
           {
-            "code": "2186-5",
-            "display": "Not Hispanic or Latino",
-            "system": "2.16.840.1.113883.6.238"
+            "code": "371924009",
+            "display": "Moderate to severe",
+            "system": "2.16.840.1.113883.6.96"
           }
         ],
-        "text": "Not Hispanic or Latino"
+        "text": "Moderate to severe"
       },
-      "primaryLanguage": {
+      "substance": {
         "codings": [
           {
-            "code": "en"
+            "code": "70618",
+            "display": "Penicillin",
+            "system": "2.16.840.1.113883.6.88"
           }
         ],
-        "text": "en"
+        "text": "Penicillin"
       },
-      "maritalStatus": {
+      "category": {
         "codings": [
           {
-            "code": "M",
-            "display": "Married",
-            "system": "2.16.840.1.113883.5.2"
+            "code": "ASSERTION",
+            "system": "2.16.840.1.113883.5.4"
           }
         ],
-        "text": "Married"
-      },
-      "race": {
-        "codings": [
-          {
-            "code": "2106-3",
-            "display": "White",
-            "system": "2.16.840.1.113883.6.238"
-          }
-        ],
-        "text": "White"
+        "text": "ASSERTION"
       }
     },
-    "encounters": [
-      {
-        "encounterDateTime": "05/01/1975 00:00:00"
-      },
-      {
-        "encounterDateTime": "09/27/2012 13:00:00+0500",
-        "encounterType": {
-          "codings": [
-            {
-              "code": "99213",
-              "display": "Office outpatient visit 15 minutes",
-              "system": "2.16.840.1.113883.6.12"
-            }
-          ],
-          "text": "Office outpatient visit 15 minutes"
-        },
-        "encounterReason": {
-          "codings": [
-            {
-              "code": "233604007",
-              "display": "Pneumonia",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Pneumonia"
-        }
-      }
-    ],
-    "healthAssessment": [
-      {
-        "assessment": {
-          "codings": [
-            {
-              "code": "54522-8",
-              "display": "Functional status",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Functional status"
-        },
-        "effectiveDate": "03/11/2013 00:00:00",
-        "resultValue": {
-          "text": "Functional Assessment",
-          "type": {
-            "text": "CD"
-          },
-          "codings": [
-            {
-              "code": "165245003",
-              "display": " Independent walking",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ]
-        }
-      },
-      {
-        "assessment": {
-          "codings": [
-            {
-              "code": "46008-9",
-              "display": "Bathing",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Bathing"
-        },
-        "effectiveDate": "",
-        "resultValue": {
-          "text": "Independent",
-          "type": {
-            "text": "CD"
-          },
-          "codings": [
-            {
-              "code": "371153006",
-              "display": "Independent",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ]
-        }
-      },
-      {
-        "assessment": {
-          "codings": [
-            {
-              "code": "72166-2",
-              "display": "Tobacco smoking status NHIS",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Tobacco smoking status NHIS"
-        },
-        "effectiveDate": "09/10/2012 00:00:00",
-        "resultValue": {
-          "text": "Former smoker",
-          "type": {
-            "text": "CD"
-          },
-          "codings": [
-            {
-              "code": "8517006",
-              "display": "Former smoker",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ]
-        }
-      },
-      {
-        "assessment": {
-          "codings": [
-            {
-              "code": "11367-0",
-              "display": "History of tobacco use",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "History of tobacco use"
-        },
-        "effectiveDate": "02/14/2009 00:00:00",
-        "resultValue": {
-          "text": "Moderate cigarette smoker, 10-19/day",
-          "type": {
-            "text": "CD"
-          },
-          "codings": [
-            {
-              "code": "160604004",
-              "display": "Moderate cigarette smoker, 10-19/day",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ]
-        }
-      },
-      {
-        "assessment": {
-          "codings": [
-            {
-              "code": "74013-4",
-              "display": "Alcoholic drinks per day",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Alcoholic drinks per day"
-        },
-        "effectiveDate": "02/15/2012 00:00:00",
-        "resultValue": {
-          "text": "12",
-          "type": {
-            "text": "PQ"
+    {
+      "effectiveDate": "",
+      "reaction": {
+        "codings": [
+          {
+            "code": "ASSERTION",
+            "system": "2.16.840.1.113883.5.4"
           }
-        }
-      }
-    ],
-    "immunizations": [
-      {
-        "immunization": {
-          "codings": [
-            {
-              "code": "88",
-              "display": "Influenza virus vaccine",
-              "system": "2.16.840.1.113883.6.59"
-            }
-          ],
-          "text": "Influenza virus vaccine"
-        },
-        "lotNumber": "1",
-        "administrationDate": "11/01/1999 00:00:00"
+        ],
+        "text": "ASSERTION"
       },
-      {
-        "immunization": {
-          "codings": [
-            {
-              "code": "88",
-              "display": "Influenza virus vaccine",
-              "system": "2.16.840.1.113883.6.59"
-            }
-          ],
-          "text": "Influenza virus vaccine"
-        },
-        "lotNumber": "1",
-        "administrationDate": "12/15/1998 00:00:00"
-      },
-      {
-        "immunization": {
-          "codings": [
-            {
-              "code": "33",
-              "display": "Pneumococcal polysaccharide vaccine",
-              "system": "2.16.840.1.113883.6.59"
-            }
-          ],
-          "text": "Pneumococcal polysaccharide vaccine"
-        },
-        "lotNumber": "1",
-        "administrationDate": "12/15/1998 00:00:00"
-      },
-      {
-        "immunization": {
-          "codings": [
-            {
-              "code": "103",
-              "display": "Tetanus and diphtheria toxoids - preservative free",
-              "system": "2.16.840.1.113883.6.59"
-            }
-          ],
-          "text": "Tetanus and diphtheria toxoids - preservative free"
-        },
-        "lotNumber": "1",
-        "administrationDate": "12/15/1998 00:00:00"
-      },
-      {
-        "immunization": {
-          "codings": [
-            {
-              "code": "45",
-              "display": "Hepatitis B vaccine",
-              "system": "2.16.840.1.113883.6.59"
-            }
-          ],
-          "text": "Hepatitis B vaccine"
-        },
-        "lotNumber": "1",
-        "administrationDate": "08/01/2013 00:00:00"
-      }
-    ],
-    "labResults": [
-      {
-        "test": {
-          "codings": [
-            {
-              "code": "718-7",
-              "display": "Hemoglobin",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Hemoglobin"
-        },
-        "order": {
-          "codings": [
-            {
-              "code": "57021-8",
-              "display": "CBC W Auto Differential panel in Blood",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "CBC W Auto Differential panel in Blood"
-        },
-        "orderDate": "03/19/2008 08:30:00-0800",
-        "performedDateTime": "03/19/2008 08:30:00-0800",
-        "referenceRange": {
-          "lowValue": "12.0",
-          "highValue": "15.5"
-        },
-        "resultValue": {
-          "text": "13.2",
-          "type": {
-            "text": "PQ"
+      "severity": {
+        "codings": [
+          {
+            "code": "255604002",
+            "display": "Mild",
+            "system": "2.16.840.1.113883.6.96"
           }
-        },
-        "resultUnit": {
-          "text": "g/dL"
-        },
-        "interpretation": {
-          "codings": [
-            {
-              "code": "N",
-              "system": "2.16.840.1.113883.5.83"
-            }
-          ],
-          "text": "N"
-        },
-        "resultStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        }
+        ],
+        "text": "Mild"
       },
-      {
-        "test": {
-          "codings": [
-            {
-              "code": "718-7",
-              "display": "Hemoglobin",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Hemoglobin"
-        },
-        "order": {
-          "codings": [
-            {
-              "code": "57021-8",
-              "display": "CBC W Auto Differential panel in Blood",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "CBC W Auto Differential panel in Blood"
-        },
-        "orderDate": "03/19/2008 08:30:00-0800",
-        "performedDateTime": "03/19/2008 08:30:00-0800",
-        "referenceRange": {
-          "lowValue": "12.0",
-          "highValue": "15.5"
-        },
-        "resultValue": {
-          "text": "13.2",
-          "type": {
-            "text": "PQ"
+      "substance": {
+        "codings": [
+          {
+            "code": "2670",
+            "display": "Codeine",
+            "system": "2.16.840.1.113883.6.88"
           }
-        },
-        "resultUnit": {
-          "text": "g/dL"
-        },
-        "interpretation": {
-          "codings": [
-            {
-              "code": "N",
-              "system": "2.16.840.1.113883.5.83"
-            }
-          ],
-          "text": "N"
-        },
-        "resultStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        }
+        ],
+        "text": "Codeine"
       },
-      {
-        "test": {
-          "codings": [
-            {
-              "code": "6690-2",
-              "display": "Leukocytes",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Leukocytes"
-        },
-        "order": {
-          "codings": [
-            {
-              "code": "57021-8",
-              "display": "CBC W Auto Differential panel in Blood",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "CBC W Auto Differential panel in Blood"
-        },
-        "orderDate": "03/19/2008 08:30:00-0800",
-        "performedDateTime": "03/19/2008 08:30:00-0800",
-        "referenceRange": {
-          "lowValue": "4.3",
-          "highValue": "10.8"
-        },
-        "resultValue": {
-          "text": "6.7",
-          "type": {
-            "text": "PQ"
-          },
-          "codings": [
-            {}
-          ]
-        },
-        "resultUnit": {
-          "text": "10*9/L"
-        },
-        "interpretation": {
-          "codings": [
-            {
-              "code": "N",
-              "system": "2.16.840.1.113883.5.83"
-            }
-          ],
-          "text": "N"
-        },
-        "resultStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        }
-      },
-      {
-        "test": {
-          "codings": [
-            {
-              "code": "777-3",
-              "display": "Platelets",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Platelets"
-        },
-        "order": {
-          "codings": [
-            {
-              "code": "57021-8",
-              "display": "CBC W Auto Differential panel in Blood",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "CBC W Auto Differential panel in Blood"
-        },
-        "orderDate": "03/19/2008 08:30:00-0800",
-        "performedDateTime": "03/19/2008 08:30:00-0800",
-        "referenceRange": {
-          "lowValue": "150",
-          "highValue": "350"
-        },
-        "resultValue": {
-          "text": "123",
-          "type": {
-            "text": "PQ"
+      "category": {
+        "codings": [
+          {
+            "code": "ASSERTION",
+            "system": "2.16.840.1.113883.5.4"
           }
-        },
-        "resultUnit": {
-          "text": "10*9/L"
-        },
-        "interpretation": {
-          "codings": [
-            {
-              "code": "LX",
-              "system": "2.16.840.1.113883.5.83"
-            }
-          ],
-          "text": "LX"
-        },
-        "resultStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        }
-      },
-      {
-        "test": {
-          "codings": [
-            {
-              "code": "4544-3",
-              "display": "Hematocrit",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Hematocrit"
-        },
-        "order": {
-          "codings": [
-            {
-              "code": "57021-8",
-              "display": "CBC W Auto Differential panel in Blood",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "CBC W Auto Differential panel in Blood"
-        },
-        "orderDate": "03/19/2008 08:30:00-0800",
-        "performedDateTime": "03/19/2008 08:30:00-0800",
-        "referenceRange": {
-          "lowValue": "34.9",
-          "highValue": "44.5"
-        },
-        "resultValue": {
-          "text": "35.3",
-          "type": {
-            "text": "PQ"
-          }
-        },
-        "resultUnit": {
-          "text": "%"
-        },
-        "interpretation": {
-          "codings": [
-            {
-              "code": "LX",
-              "system": "2.16.840.1.113883.5.83"
-            }
-          ],
-          "text": "LX"
-        },
-        "resultStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        }
-      },
-      {
-        "test": {
-          "codings": [
-            {
-              "code": "789-8",
-              "display": "Erythrocytes",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Erythrocytes"
-        },
-        "order": {
-          "codings": [
-            {
-              "code": "57021-8",
-              "display": "CBC W Auto Differential panel in Blood",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "CBC W Auto Differential panel in Blood"
-        },
-        "orderDate": "03/19/2008 08:30:00-0800",
-        "performedDateTime": "03/19/2008 08:30:00-0800",
-        "referenceRange": {
-          "lowValue": "3.90",
-          "highValue": "5.03"
-        },
-        "resultValue": {
-          "text": "4.21",
-          "type": {
-            "text": "PQ"
-          }
-        },
-        "resultUnit": {
-          "text": "10*12/L"
-        },
-        "interpretation": {
-          "codings": [
-            {
-              "code": "N",
-              "system": "2.16.840.1.113883.5.83"
-            }
-          ],
-          "text": "N"
-        },
-        "resultStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        }
-      },
-      {
-        "test": {
-          "codings": [
-            {
-              "code": "3094-0",
-              "display": "Urea nitrogen, Serum",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Urea nitrogen, Serum"
-        },
-        "order": {
-          "codings": [
-            {
-              "code": "166312007",
-              "display": "Blood chemistry test",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Blood chemistry test"
-        },
-        "orderDate": "03/20/2008 09:30:00-0800",
-        "performedDateTime": "03/20/2008 09:30:00-0800",
-        "resultValue": {
-          "text": "",
-          "type": {
-            "text": "PQ"
-          }
-        },
-        "resultStatus": {
-          "codings": [
-            {
-              "code": "active"
-            }
-          ],
-          "text": "active"
-        }
+        ],
+        "text": "ASSERTION"
       }
-    ],
-    "medicalDevices": [
-      {
-        "deviceType": {
-          "codings": [
-            {
-              "code": "87405001",
-              "display": "cane",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "cane"
-        }
-      }
-    ],
-    "medications": [
-      {
-        "medication": {
-          "codings": [
-            {
-              "code": "573621",
-              "display": "Proventil 0.09 MG/ACTUAT inhalant solution",
-              "system": "2.16.840.1.113883.6.88"
-            }
-          ],
-          "text": "Proventil 0.09 MG/ACTUAT inhalant solution"
-        },
-        "startDate": "01/03/2011 00:00:00",
-        "doseRoute": {
-          "codings": [
-            {
-              "code": "C38216",
-              "display": "RESPIRATORY (INHALATION)",
-              "system": "2.16.840.1.113883.3.26.1.1"
-            }
-          ],
-          "text": "RESPIRATORY (INHALATION)"
-        },
-        "doseAmount": "2",
-        "doseQuantity": "75",
-        "fillStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        },
-        "instructions": "label in spanish",
-        "indication": {
-          "codings": [
-            {
-              "code": "195967001",
-              "display": "Asthma",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Asthma"
-        }
+    }
+  ],
+  "conditions": [
+    {
+      "conditionType": {
+        "text": "Problem"
       },
-      {
-        "medication": {
-          "codings": [
-            {
-              "code": "197380",
-              "display": "Atenolol 25 MG Oral Tablet",
-              "system": "2.16.840.1.113883.6.88"
-            }
-          ],
-          "text": "Atenolol 25 MG Oral Tablet"
-        },
-        "startDate": "03/18/2012 00:00:00",
-        "doseRoute": {
-          "codings": [
-            {
-              "code": "C38288",
-              "display": "ORAL",
-              "system": "2.16.840.1.113883.3.26.1.1"
-            }
-          ],
-          "text": "ORAL"
-        },
-        "doseAmount": "1",
-        "indication": {
-          "codings": [
-            {
-              "code": "38341003",
-              "display": "Hypertension",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Hypertension"
-        }
-      }
-    ],
-    "procedures": [
-      {
-        "procedure": {
-          "codings": [
-            {
-              "code": "73761001",
-              "display": "Colonoscopy",
-              "system": "2.16.840.1.113883.6.96"
-            }
-          ],
-          "text": "Colonoscopy"
-        },
-        "procedureDateTime": "05/12/2012 00:00:00"
-      }
-    ],
-    "vitalSigns": [
-      {
-        "vitalSign": {
-          "codings": [
-            {
-              "code": "8302-2",
-              "display": "Height",
-              "system": "2.16.840.1.113883.6.1"
-            }
-          ],
-          "text": "Height"
-        },
-        "performedDateTime": "09/10/2012 00:00:00",
-        "resultValue": {
-          "text": "177",
-          "type": {
-            "text": "PQ"
+      "condition": {
+        "codings": [
+          {
+            "code": "233604007",
+            "display": "Pneumonia",
+            "system": "2.16.840.1.113883.6.96"
           }
-        },
-        "resultUnit": {
-          "text": "cm"
-        },
-        "interpretation": {
-          "codings": [
-            {
-              "code": "N",
-              "system": "2.16.840.1.113883.5.83"
-            }
-          ],
-          "text": "N"
-        },
-        "resultStatus": {
-          "codings": [
-            {
-              "code": "completed"
-            }
-          ],
-          "text": "completed"
-        }
+        ],
+        "text": "Pneumonia"
+      },
+      "onsetDate": "07/03/2013 00:00:00",
+      "resolutionDate": "08/14/2008 00:00:00",
+      "conditionStatus": {
+        "codings": [
+          {
+            "code": "active"
+          }
+        ],
+        "text": "active"
       }
-    ],
-    "id": "123"
+    },
+    {
+      "conditionType": {
+        "text": "Problem"
+      },
+      "condition": {
+        "codings": [
+          {
+            "code": "29857009",
+            "display": "Chest pain",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Chest pain"
+      },
+      "onsetDate": "04/14/2007 00:00:00",
+      "conditionStatus": {
+        "codings": [
+          {
+            "code": "active"
+          }
+        ],
+        "text": "active"
+      }
+    },
+    {
+      "conditionType": {
+        "text": "Problem"
+      },
+      "condition": {
+        "codings": [
+          {
+            "code": "194828000",
+            "display": "Angina",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Angina"
+      },
+      "onsetDate": "04/17/2007 00:00:00",
+      "conditionStatus": {
+        "codings": [
+          {
+            "code": "active"
+          }
+        ],
+        "text": "active"
+      }
+    },
+    {
+      "conditionType": {
+        "text": "Problem"
+      },
+      "condition": {
+        "codings": [
+          {
+            "code": "233604007",
+            "display": "Pneumonia",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Pneumonia"
+      },
+      "onsetDate": "03/10/1998 00:00:00",
+      "resolutionDate": "03/16/1998 00:00:00",
+      "conditionStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    }
+  ],
+  "demographics": {
+    "birthSex": {
+      "codings": [
+        {
+          "code": "F",
+          "display": "Female",
+          "system": "2.16.840.1.113883.5.1"
+        }
+      ],
+      "text": "Female"
+    },
+    "birthDate": "05/01/1975 00:00:00",
+    "ethnicity": {
+      "codings": [
+        {
+          "code": "2186-5",
+          "display": "Not Hispanic or Latino",
+          "system": "2.16.840.1.113883.6.238"
+        }
+      ],
+      "text": "Not Hispanic or Latino"
+    },
+    "primaryLanguage": {
+      "codings": [
+        {
+          "code": "en"
+        }
+      ],
+      "text": "en"
+    },
+    "maritalStatus": {
+      "codings": [
+        {
+          "code": "M",
+          "display": "Married",
+          "system": "2.16.840.1.113883.5.2"
+        }
+      ],
+      "text": "Married"
+    },
+    "race": {
+      "codings": [
+        {
+          "code": "2106-3",
+          "display": "White",
+          "system": "2.16.840.1.113883.6.238"
+        }
+      ],
+      "text": "White"
+    }
   },
-  "dataSourceID": "Test Source C-CDA",
-  "dataProviderID": "Connectathon",
-  "messageID": "2.16.840.1.113883.19.5.99999.1"
+  "encounters": [
+    {
+      "encounterDateTime": "05/01/1975 00:00:00"
+    },
+    {
+      "encounterDateTime": "09/27/2012 13:00:00+0500",
+      "encounterType": {
+        "codings": [
+          {
+            "code": "99213",
+            "display": "Office outpatient visit 15 minutes",
+            "system": "2.16.840.1.113883.6.12"
+          }
+        ],
+        "text": "Office outpatient visit 15 minutes"
+      },
+      "encounterReason": {
+        "codings": [
+          {
+            "code": "233604007",
+            "display": "Pneumonia",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Pneumonia"
+      }
+    }
+  ],
+  "healthAssessment": [
+    {
+      "assessment": {
+        "codings": [
+          {
+            "code": "54522-8",
+            "display": "Functional status",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Functional status"
+      },
+      "effectiveDate": "03/11/2013 00:00:00",
+      "resultValue": {
+        "text": "Functional Assessment",
+        "type": {
+          "text": "CD"
+        },
+        "codings": [
+          {
+            "code": "165245003",
+            "display": " Independent walking",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ]
+      }
+    },
+    {
+      "assessment": {
+        "codings": [
+          {
+            "code": "46008-9",
+            "display": "Bathing",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Bathing"
+      },
+      "effectiveDate": "",
+      "resultValue": {
+        "text": "Independent",
+        "type": {
+          "text": "CD"
+        },
+        "codings": [
+          {
+            "code": "371153006",
+            "display": "Independent",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ]
+      }
+    },
+    {
+      "assessment": {
+        "codings": [
+          {
+            "code": "72166-2",
+            "display": "Tobacco smoking status NHIS",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Tobacco smoking status NHIS"
+      },
+      "effectiveDate": "09/10/2012 00:00:00",
+      "resultValue": {
+        "text": "Former smoker",
+        "type": {
+          "text": "CD"
+        },
+        "codings": [
+          {
+            "code": "8517006",
+            "display": "Former smoker",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ]
+      }
+    },
+    {
+      "assessment": {
+        "codings": [
+          {
+            "code": "11367-0",
+            "display": "History of tobacco use",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "History of tobacco use"
+      },
+      "effectiveDate": "02/14/2009 00:00:00",
+      "resultValue": {
+        "text": "Moderate cigarette smoker, 10-19/day",
+        "type": {
+          "text": "CD"
+        },
+        "codings": [
+          {
+            "code": "160604004",
+            "display": "Moderate cigarette smoker, 10-19/day",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ]
+      }
+    },
+    {
+      "assessment": {
+        "codings": [
+          {
+            "code": "74013-4",
+            "display": "Alcoholic drinks per day",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Alcoholic drinks per day"
+      },
+      "effectiveDate": "02/15/2012 00:00:00",
+      "resultValue": {
+        "text": "12",
+        "type": {
+          "text": "PQ"
+        }
+      }
+    }
+  ],
+  "immunizations": [
+    {
+      "immunization": {
+        "codings": [
+          {
+            "code": "88",
+            "display": "Influenza virus vaccine",
+            "system": "2.16.840.1.113883.6.59"
+          }
+        ],
+        "text": "Influenza virus vaccine"
+      },
+      "lotNumber": "1",
+      "administrationDate": "11/01/1999 00:00:00"
+    },
+    {
+      "immunization": {
+        "codings": [
+          {
+            "code": "88",
+            "display": "Influenza virus vaccine",
+            "system": "2.16.840.1.113883.6.59"
+          }
+        ],
+        "text": "Influenza virus vaccine"
+      },
+      "lotNumber": "1",
+      "administrationDate": "12/15/1998 00:00:00"
+    },
+    {
+      "immunization": {
+        "codings": [
+          {
+            "code": "33",
+            "display": "Pneumococcal polysaccharide vaccine",
+            "system": "2.16.840.1.113883.6.59"
+          }
+        ],
+        "text": "Pneumococcal polysaccharide vaccine"
+      },
+      "lotNumber": "1",
+      "administrationDate": "12/15/1998 00:00:00"
+    },
+    {
+      "immunization": {
+        "codings": [
+          {
+            "code": "103",
+            "display": "Tetanus and diphtheria toxoids - preservative free",
+            "system": "2.16.840.1.113883.6.59"
+          }
+        ],
+        "text": "Tetanus and diphtheria toxoids - preservative free"
+      },
+      "lotNumber": "1",
+      "administrationDate": "12/15/1998 00:00:00"
+    },
+    {
+      "immunization": {
+        "codings": [
+          {
+            "code": "45",
+            "display": "Hepatitis B vaccine",
+            "system": "2.16.840.1.113883.6.59"
+          }
+        ],
+        "text": "Hepatitis B vaccine"
+      },
+      "lotNumber": "1",
+      "administrationDate": "08/01/2013 00:00:00"
+    }
+  ],
+  "labResults": [
+    {
+      "test": {
+        "codings": [
+          {
+            "code": "718-7",
+            "display": "Hemoglobin",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Hemoglobin"
+      },
+      "order": {
+        "codings": [
+          {
+            "code": "57021-8",
+            "display": "CBC W Auto Differential panel in Blood",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "CBC W Auto Differential panel in Blood"
+      },
+      "orderDate": "03/19/2008 08:30:00-0800",
+      "performedDateTime": "03/19/2008 08:30:00-0800",
+      "referenceRange": {
+        "lowValue": "12.0",
+        "highValue": "15.5"
+      },
+      "resultValue": {
+        "text": "13.2",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "g/dL"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "test": {
+        "codings": [
+          {
+            "code": "6690-2",
+            "display": "Leukocytes",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Leukocytes"
+      },
+      "order": {
+        "codings": [
+          {
+            "code": "57021-8",
+            "display": "CBC W Auto Differential panel in Blood",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "CBC W Auto Differential panel in Blood"
+      },
+      "orderDate": "03/19/2008 08:30:00-0800",
+      "performedDateTime": "03/19/2008 08:30:00-0800",
+      "referenceRange": {
+        "lowValue": "4.3",
+        "highValue": "10.8"
+      },
+      "resultValue": {
+        "text": "6.7",
+        "type": {
+          "text": "PQ"
+        },
+        "codings": [
+          {}
+        ]
+      },
+      "resultUnit": {
+        "text": "10*9/L"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "test": {
+        "codings": [
+          {
+            "code": "777-3",
+            "display": "Platelets",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Platelets"
+      },
+      "order": {
+        "codings": [
+          {
+            "code": "57021-8",
+            "display": "CBC W Auto Differential panel in Blood",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "CBC W Auto Differential panel in Blood"
+      },
+      "orderDate": "03/19/2008 08:30:00-0800",
+      "performedDateTime": "03/19/2008 08:30:00-0800",
+      "referenceRange": {
+        "lowValue": "150",
+        "highValue": "350"
+      },
+      "resultValue": {
+        "text": "123",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "10*9/L"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "LX",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "LX"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "test": {
+        "codings": [
+          {
+            "code": "4544-3",
+            "display": "Hematocrit",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Hematocrit"
+      },
+      "order": {
+        "codings": [
+          {
+            "code": "57021-8",
+            "display": "CBC W Auto Differential panel in Blood",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "CBC W Auto Differential panel in Blood"
+      },
+      "orderDate": "03/19/2008 08:30:00-0800",
+      "performedDateTime": "03/19/2008 08:30:00-0800",
+      "referenceRange": {
+        "lowValue": "34.9",
+        "highValue": "44.5"
+      },
+      "resultValue": {
+        "text": "35.3",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "%"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "LX",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "LX"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "test": {
+        "codings": [
+          {
+            "code": "789-8",
+            "display": "Erythrocytes",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Erythrocytes"
+      },
+      "order": {
+        "codings": [
+          {
+            "code": "57021-8",
+            "display": "CBC W Auto Differential panel in Blood",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "CBC W Auto Differential panel in Blood"
+      },
+      "orderDate": "03/19/2008 08:30:00-0800",
+      "performedDateTime": "03/19/2008 08:30:00-0800",
+      "referenceRange": {
+        "lowValue": "3.90",
+        "highValue": "5.03"
+      },
+      "resultValue": {
+        "text": "4.21",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "10*12/L"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "test": {
+        "codings": [
+          {
+            "code": "3094-0",
+            "display": "Urea nitrogen, Serum",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Urea nitrogen, Serum"
+      },
+      "order": {
+        "codings": [
+          {
+            "code": "166312007",
+            "display": "Blood chemistry test",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Blood chemistry test"
+      },
+      "orderDate": "03/20/2008 09:30:00-0800",
+      "performedDateTime": "03/20/2008 09:30:00-0800",
+      "resultValue": {
+        "text": "",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "active"
+          }
+        ],
+        "text": "active"
+      }
+    },
+    {
+      "test": {
+        "codings": [
+          {
+            "code": "61151-7",
+            "display": "Albumin SerPl BCG-mCnc",
+            "system": ""
+          }
+        ],
+        "text": "Albumin SerPl BCG-mCnc"
+      },
+      "order": {
+        "codings": [
+          {
+            "code": "166312007",
+            "display": "Blood chemistry test",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Blood chemistry test"
+      },
+      "orderDate": "03/20/2008 09:30:00-0800",
+      "performedDateTime": "03/20/2008 09:30:00-0800",
+      "resultValue": {
+        "text": "40",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "active"
+          }
+        ],
+        "text": "active"
+      }
+    }
+  ],
+  "medicalDevices": [
+    {
+      "deviceType": {
+        "codings": [
+          {
+            "code": "87405001",
+            "display": "cane",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "cane"
+      }
+    }
+  ],
+  "medications": [
+    {
+      "medication": {
+        "codings": [
+          {
+            "code": "573621",
+            "display": "Proventil 0.09 MG/ACTUAT inhalant solution",
+            "system": "2.16.840.1.113883.6.88"
+          }
+        ],
+        "text": "Proventil 0.09 MG/ACTUAT inhalant solution"
+      },
+      "startDate": "01/03/2011 00:00:00",
+      "doseRoute": {
+        "codings": [
+          {
+            "code": "C38216",
+            "display": "RESPIRATORY (INHALATION)",
+            "system": "2.16.840.1.113883.3.26.1.1"
+          }
+        ],
+        "text": "RESPIRATORY (INHALATION)"
+      },
+      "doseAmount": "2",
+      "doseQuantity": "75",
+      "fillStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      },
+      "instructions": "label in spanish",
+      "indication": {
+        "codings": [
+          {
+            "code": "195967001",
+            "display": "Asthma",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Asthma"
+      }
+    },
+    {
+      "medication": {
+        "codings": [
+          {
+            "code": "197380",
+            "display": "Atenolol 25 MG Oral Tablet",
+            "system": "2.16.840.1.113883.6.88"
+          }
+        ],
+        "text": "Atenolol 25 MG Oral Tablet"
+      },
+      "startDate": "03/18/2012 00:00:00",
+      "doseRoute": {
+        "codings": [
+          {
+            "code": "C38288",
+            "display": "ORAL",
+            "system": "2.16.840.1.113883.3.26.1.1"
+          }
+        ],
+        "text": "ORAL"
+      },
+      "doseAmount": "1",
+      "indication": {
+        "codings": [
+          {
+            "code": "38341003",
+            "display": "Hypertension",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Hypertension"
+      }
+    }
+  ],
+  "procedures": [
+    {
+      "procedure": {
+        "codings": [
+          {
+            "code": "73761001",
+            "display": "Colonoscopy",
+            "system": "2.16.840.1.113883.6.96"
+          }
+        ],
+        "text": "Colonoscopy"
+      },
+      "procedureDateTime": "05/12/2012 00:00:00"
+    }
+  ],
+  "vitalSigns": [
+    {
+      "vitalSign": {
+        "codings": [
+          {
+            "code": "8302-2",
+            "display": "Height",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Height"
+      },
+      "performedDateTime": "09/10/2012 00:00:00",
+      "resultValue": {
+        "text": "177",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "cm"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "vitalSign": {
+        "codings": [
+          {
+            "code": "3141-9",
+            "display": "Patient Body Weight - Measured",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Patient Body Weight - Measured"
+      },
+      "performedDateTime": "09/10/2012 00:00:00",
+      "resultValue": {
+        "text": "86",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "kg"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "vitalSign": {
+        "codings": [
+          {
+            "code": "8480-6",
+            "display": "Intravascular Systolic",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Intravascular Systolic"
+      },
+      "performedDateTime": "09/10/2012 00:00:00",
+      "resultValue": {
+        "text": "132",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "mm[Hg]"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "vitalSign": {
+        "codings": [
+          {
+            "code": "8462-4",
+            "display": "BP Diastolic",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "BP Diastolic"
+      },
+      "performedDateTime": "09/10/2012 00:00:00",
+      "resultValue": {
+        "text": "88",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "mm[Hg]"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "vitalSign": {
+        "codings": [
+          {
+            "code": "8302-2",
+            "display": "Height",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Height"
+      },
+      "performedDateTime": "09/01/2011 00:00:00",
+      "resultValue": {
+        "text": "177",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "cm"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "vitalSign": {
+        "codings": [
+          {
+            "code": "3141-9",
+            "display": "Patient Body Weight - Measured",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "Patient Body Weight - Measured"
+      },
+      "performedDateTime": "09/01/2011 00:00:00",
+      "resultValue": {
+        "text": "88",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "kg"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "vitalSign": {
+        "codings": [
+          {
+            "code": "8480-6",
+            "display": "BP Systolic",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "BP Systolic"
+      },
+      "performedDateTime": "09/01/2011 00:00:00",
+      "resultValue": {
+        "text": "128",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "mm[Hg]"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    },
+    {
+      "vitalSign": {
+        "codings": [
+          {
+            "code": "8462-4",
+            "display": "BP Diastolic",
+            "system": "2.16.840.1.113883.6.1"
+          }
+        ],
+        "text": "BP Diastolic"
+      },
+      "performedDateTime": "09/01/2011 00:00:00",
+      "resultValue": {
+        "text": "80",
+        "type": {
+          "text": "PQ"
+        }
+      },
+      "resultUnit": {
+        "text": "mm[Hg]"
+      },
+      "interpretation": {
+        "codings": [
+          {
+            "code": "N",
+            "system": "2.16.840.1.113883.5.83"
+          }
+        ],
+        "text": "N"
+      },
+      "resultStatus": {
+        "codings": [
+          {
+            "code": "completed"
+          }
+        ],
+        "text": "completed"
+      }
+    }
+  ],
+  "id": "123"
 }

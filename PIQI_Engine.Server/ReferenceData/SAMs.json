@@ -1232,18 +1232,30 @@
       },
       "parameters": [
         {
-          "name": "Knowledge Pattern Id",
-          "Mnemonic": "IKE_PATTERN_ID",
+          "name": "Stamp Coordinate Identifier",
+          "Mnemonic": "STAMP_COORDINATE_IDENTIFIER",
+          "parameterValueTypeName": "Simple Value",
+          "isOptional": "false"
+        },
+        {
+          "name": "Language Coordinate Identifier",
+          "Mnemonic": "LANGUAGE_COORDINATE_IDENTIFIER",
+          "parameterValueTypeName": "Simple Value",
+          "isOptional": "false"
+        },
+        {
+          "name": "Navigation Coordinate Identifier",
+          "Mnemonic": "NAVIGATION_COORDINATE_IDENTIFIER",
           "parameterValueTypeName": "Simple Value",
           "isOptional": "false"
         }
       ]
     },
     {
-      "mnemonic": "LAB_DEVICE_VERIFIABILITY",
-      "name": "Knowledge-based Lab Device Verifiability Check",
+      "mnemonic": "LAB_DEVICE_PLAUSIBILITY",
+      "name": "Knowledge-based Lab Device Plausibility Check",
       "inputType": "ELM",
-      "HDQTDimensionMnemonic": "Verifiability.Lab.Device",
+      "HDQTDimensionMnemonic": "Plausibility.Lab.Device",
       "executionTypeMnemonic": "RESTful_Service",
       "createdDateTime": "2026-01-12T11:42:05.123",
       "modifiedDateTime": "2026-01-12T11:42:05.123",
@@ -1253,8 +1265,20 @@
       },
       "parameters": [
         {
-          "name": "Knowledge Pattern Id",
-          "Mnemonic": "IKE_PATTERN_ID",
+          "name": "Stamp Coordinate Identifier",
+          "Mnemonic": "STAMP_COORDINATE_IDENTIFIER",
+          "parameterValueTypeName": "Simple Value",
+          "isOptional": "false"
+        },
+        {
+          "name": "Language Coordinate Identifier",
+          "Mnemonic": "LANGUAGE_COORDINATE_IDENTIFIER",
+          "parameterValueTypeName": "Simple Value",
+          "isOptional": "false"
+        },
+        {
+          "name": "Navigation Coordinate Identifier",
+          "Mnemonic": "NAVIGATION_COORDINATE_IDENTIFIER",
           "parameterValueTypeName": "Simple Value",
           "isOptional": "false"
         }

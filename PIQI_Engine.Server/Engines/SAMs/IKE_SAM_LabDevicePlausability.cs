@@ -8,7 +8,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
     /// SAM (Semantic Assessment Module) that evaluates whether a <see cref="CodeableConcept"/>
     /// contains at least one valid coding according to the FHIR server.
     /// </summary>
-    public class IKE_SAM_LabDeviceVerafiability : SAMBase
+    public class IKE_SAM_LabDevicePlausability : SAMBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SAM_ConceptIsValid"/> class.
@@ -17,7 +17,7 @@ namespace PIQI_Engine.Server.Engines.SAMs
         /// <param name="samService">
         /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
         /// </param>
-        public IKE_SAM_LabDeviceVerafiability(SAM sam, SAMService samService)
+        public IKE_SAM_LabDevicePlausability(SAM sam, SAMService samService)
             : base(sam, samService) { }
 
         /// <summary>
@@ -56,31 +56,33 @@ namespace PIQI_Engine.Server.Engines.SAMs
                 MessageModelItem item = evaluationItem?.MessageItem;
                 JToken token = JToken.Parse(item.MessageText);
 
-                System.Console.WriteLine("LAB DEVICE VERIFIABILITY");
+                //Get Test Code, Low Ref Range, High Ref Range, and Units
+                string? testCode = token.SelectToken("test.codings[0].code")?.ToString();
+                string? lowRefRange = token.SelectToken("referenceRange.lowValue")?.ToString();
+                string? highRefRange = token.SelectToken("referenceRange.highValue")?.ToString();
+                string? units = token.SelectToken("resultUnit.text")?.ToString();
 
-
-                // _SAMService.checkPlausabilityAsync(Guid.Empty, null);
-
-
-                // // Set the message model item
-                // MessageModelItem item = (MessageModelItem)request.MessageObject;
-
-                // // Since we're an attr sam we want to play with the item's message data
-                // BaseText data = (BaseText)item.MessageData;
-
-                // // Validate the data format
-                // if (data is not CodeableConcept codeableConcept)
-                //     throw new Exception("CodeableConceptIsValidConcept expects a CodeableConcept value.");
-
-                // // Call FHIR server if not called already
-                // if (!codeableConcept.FHIRServerCalled)
-                //     await _SAMService.LookupCodeAsync(codeableConcept);
-
-                // // Check if any codings are valid
-                // passed = codeableConcept.CodingList.Any(t => t.IsValid);
+                if (testCode != null && lowRefRange != null && highRefRange != null && units != null)
+                {
+                    var response = await _SAMService.CheckLabDevicePlausibilityAsync(testCode, lowRefRange, highRefRange, units, request.ParmList);
+                    if (response == "PLAUSIBLE")
+                    {
+                        passed = true;
+                    }
+                    else if (response == "IMPLAUSIBLE")
+                    {
+                        result.Fail("Plausibility check failed");
+                        passed = false;
+                    }
+                    else if (response == "UNKNOWN")
+                    {
+                        result.Skip("Plausibility unknown");
+                        passed = true;
+                    }
+                }
 
                 // // Update result
-                // result.Done(passed);
+                result.Done(passed);
             }
             catch (Exception ex)
             {

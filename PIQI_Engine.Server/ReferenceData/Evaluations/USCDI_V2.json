@@ -440,31 +440,22 @@
       "criticalityIndicator": true,
       "samParameters": [
         {
-          "samParameterMnemonic": "IKE_PATTERN_ID",
-          "parameterValue": "e29dae30-5039-52ad-9ed6-65ee5c1ca3d9",
-          "parameterValueTypeName": "Knowledge Identifier",
-          "parameterName": "Knowledge Pattern Id"
-        }
-      ],
-      "conditionalSamParameters": []
-    },
-    {
-      "sequence": 25,
-      "description": "Check verifiability of lab device configuration",
-      "entity": "LAB_ELEMENT",
-      "samMnemonic": "LAB_DEVICE_VERIFIABILITY",
-      "samNameOverride": "Lab Device Verifiability Check",
-      "failureNameOverride": "Lab Device Verifiability Check Failed",
-      "conditionalSam": null,
-      "scoringEffect": "Scoring",
-      "scoringWeight": 1,
-      "criticalityIndicator": true,
-      "samParameters": [
+          "samParameterMnemonic": "STAMP_COORDINATE_IDENTIFIER",
+          "parameterValue": "1767ad74-0b89-4601-b293-89dc0c51917a",
+          "parameterValueTypeName": "Knowledge Coordinate Identifier",
+          "parameterName": "Stamp Coordinate Identifier"
+        },
         {
-          "samParameterMnemonic": "IKE_PATTERN_ID",
-          "parameterValue": "e29dae30-5039-52ad-9ed6-65ee5c1ca3d9",
-          "parameterValueTypeName": "Knowledge Identifier",
-          "parameterName": "Knowledge Pattern Id"
+          "samParameterMnemonic": "LANGUAGE_COORDINATE_IDENTIFIER",
+          "parameterValue": "05df10d8-88c2-440c-a3c0-a286f14b4cd7",
+          "parameterValueTypeName": "Knowledge Coordinate Identifier",
+          "parameterName": "Language Coordinate Identifier"
+        },
+        {
+          "samParameterMnemonic": "NAVIGATION_COORDINATE_IDENTIFIER",
+          "parameterValue": "10f727e4-adac-4a94-80f5-00614692aa46",
+          "parameterValueTypeName": "Knowledge Coordinate Identifier",
+          "parameterName": "Navigation Coordinate Identifier"
         }
       ],
       "conditionalSamParameters": []

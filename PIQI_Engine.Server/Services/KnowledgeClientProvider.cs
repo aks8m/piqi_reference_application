@@ -10,7 +10,10 @@ namespace PIQI_Engine.Server.Services
         /// </summary>
         HttpClient Client { get; }
 
-        Task<HttpResponseMessage> checkPlausabilityAsync(Guid patternId, List<string> codes);
+        Task<HttpResponseMessage> CheckLabResultPlausibilityAsync(string dobString, string testCode, string resultValue, List<Tuple<string, string>> coordinateParams);
+
+        Task<HttpResponseMessage> CheckLabDevicePlausibilityAsync(string testCode, string refRangeLow, string refRangeHigh, string unit, List<Tuple<string, string>> coordinateParams);
+
     }
 
     /// <summary>
@@ -32,11 +35,26 @@ namespace PIQI_Engine.Server.Services
             Client = client;
         }
 
-        public async Task<HttpResponseMessage> checkPlausabilityAsync(Guid patternId, List<string> codes)
+        public async Task<HttpResponseMessage> CheckLabResultPlausibilityAsync(string dobString, string testCode, string resultValue, List<Tuple<string, string>> coordinateParams)
         {
-            
+            string stamp = coordinateParams.FirstOrDefault(p => p.Item1 == "STAMP_COORDINATE_IDENTIFIER")?.Item2 ?? "";
+            string lang = coordinateParams.FirstOrDefault(p => p.Item1 == "LANGUAGE_COORDINATE_IDENTIFIER")?.Item2 ?? "";
+            string nav = coordinateParams.FirstOrDefault(p => p.Item1 == "NAVIGATION_COORDINATE_IDENTIFIER")?.Item2 ?? "";
 
-            return null;
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/plausibility/lab-result?dob={dobString}&testCode={testCode}&resultValue={resultValue}&stamp={stamp}&lang={lang}&nav={nav}");
+            var response = await Client.SendAsync(request);
+            return response;
+        }
+
+        public async Task<HttpResponseMessage> CheckLabDevicePlausibilityAsync(string testCode, string refRangeLow, string refRangeHigh, string unit, List<Tuple<string, string>> coordinateParams)
+        {
+            string stamp = coordinateParams.FirstOrDefault(p => p.Item1 == "STAMP_COORDINATE_IDENTIFIER")?.Item2 ?? "";
+            string lang = coordinateParams.FirstOrDefault(p => p.Item1 == "LANGUAGE_COORDINATE_IDENTIFIER")?.Item2 ?? "";
+            string nav = coordinateParams.FirstOrDefault(p => p.Item1 == "NAVIGATION_COORDINATE_IDENTIFIER")?.Item2 ?? "";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/plausibility/lab-device?testCode={testCode}&refRangeLow={refRangeLow}&refRangeHigh={refRangeHigh}&unit={unit}&stamp={stamp}&lang={lang}&nav={nav}");
+            var response = await Client.SendAsync(request);
+            return response;
         }
     }
 }

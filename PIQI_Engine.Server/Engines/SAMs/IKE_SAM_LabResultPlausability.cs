@@ -4,46 +4,13 @@ using Newtonsoft.Json.Linq;
 
 namespace PIQI_Engine.Server.Engines.SAMs
 {
-    /// <summary>
-    /// SAM (Semantic Assessment Module) that evaluates whether a <see cref="CodeableConcept"/>
-    /// contains at least one valid coding according to the FHIR server.
-    /// </summary>
+
     public class IKE_SAM_LabResultPlausability : SAMBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SAM_ConceptIsValid"/> class.
-        /// </summary>
-        /// <param name="sam">The parent <see cref="SAM"/> object providing configuration and context.</param>
-        /// <param name="samService">
-        /// An implementation of <see cref="SAMService"/> used to access reference data and make FHIR API calls.
-        /// </param>
+
         public IKE_SAM_LabResultPlausability(SAM sam, SAMService samService)
             : base(sam, samService) { }
 
-        /// <summary>
-        /// Evaluates whether the provided <see cref="MessageModelItem"/> contains
-        /// a <see cref="CodeableConcept"/> with at least one valid coding.
-        /// Calls the FHIR $lookup API if needed.
-        /// </summary>
-        /// <param name="request">
-        /// The <see cref="PIQISAMRequest"/> containing:
-        /// <list type="bullet">
-        ///   <item>The <see cref="PIQISAMRequest.MessageObject"/>, expected to be a <see cref="MessageModelItem"/> containing a <see cref="CodeableConcept"/>.</item>
-        /// </list>
-        /// </param>
-        /// <returns>
-        /// A <see cref="Task{PIQISAMResponse}"/> representing the asynchronous evaluation result.
-        /// The response indicates:
-        /// <list type="bullet">
-        ///   <item><c>Succeeded</c> if at least one coding in the <see cref="CodeableConcept"/> is valid.</item>
-        ///   <item><c>Failed</c> if no codings are valid.</item>
-        ///   <item><c>Errored</c> if the input data is invalid or an exception occurs.</item>
-        /// </list>
-        /// </returns>
-        /// <exception cref="Exception">
-        /// Thrown if the input is not a <see cref="MessageModelItem"/> 
-        /// or if its <see cref="MessageModelItem.MessageData"/> is not a <see cref="CodeableConcept"/>.
-        /// </exception>
         public override async Task<PIQISAMResponse> EvaluateAsync(PIQISAMRequest request)
         {
             PIQISAMResponse result = new();
@@ -56,30 +23,41 @@ namespace PIQI_Engine.Server.Engines.SAMs
                 MessageModelItem item = evaluationItem?.MessageItem;
                 JToken token = JToken.Parse(item.MessageText);
 
-                System.Console.WriteLine("LAB RESULT PLAUSABILITY");
+                //Get date of birth string value
+                var dobString = token.SelectToken("$.demographics.birthDate")?.ToString();
 
-                // _SAMService.checkPlausabilityAsync(Guid.Empty, null);
-
-
-                // // Set the message model item
-                // MessageModelItem item = (MessageModelItem)request.MessageObject;
-
-                // // Since we're an attr sam we want to play with the item's message data
-                // BaseText data = (BaseText)item.MessageData;
-
-                // // Validate the data format
-                // if (data is not CodeableConcept codeableConcept)
-                //     throw new Exception("CodeableConceptIsValidConcept expects a CodeableConcept value.");
-
-                // // Call FHIR server if not called already
-                // if (!codeableConcept.FHIRServerCalled)
-                //     await _SAMService.LookupCodeAsync(codeableConcept);
-
-                // // Check if any codings are valid
-                // passed = codeableConcept.CodingList.Any(t => t.IsValid);
+                //Get touple of test code and lab result value
+                JArray? labResults = token.SelectToken("$.labResults") as JArray;
+                if (labResults != null)
+                {
+                    foreach (JToken labResult in labResults)
+                    {
+                        string? testCode = labResult.SelectToken("test.codings[0].code")?.ToString();
+                        string? resultValue = labResult.SelectToken("resultValue.text")?.ToString();
+                        if (dobString != null && testCode != null && resultValue != null)
+                        {
+                            var response = await _SAMService.CheckLabResultPlausibilityAsync(dobString, testCode, resultValue, request.ParmList);
+                            if (response == "PLAUSIBLE")
+                            {
+                                passed = true;
+                            }
+                            else if (response == "IMPLAUSIBLE")
+                            {
+                                result.Fail("Plausibility check failed");
+                                passed = false;
+                                break;
+                            }
+                            else if (response == "UNKNOWN")
+                            {
+                                result.Skip("Plausibility unknown");
+                                passed = true;
+                            }
+                        }
+                    }
+                }
 
                 // // Update result
-                // result.Done(passed);
+                result.Done(passed);
             }
             catch (Exception ex)
             {
